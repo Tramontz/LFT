@@ -186,19 +186,18 @@ public class Translator {
 			break;
 
 		case Tag.PRINT:
-			int next_print = code.newLabel();
+			//int next_print = code.newLabel();wefwefwefwefwefwef
 			match(Tag.PRINT);
 			exprlist();
 			code.emit(OpCode.invokestatic, 1); // 1 == invoca la funzione print
-			code.emitLabel(next_print);
+			//code.emitLabel(lnext);wefwefwefwefwefwfwefw
 			break;
 
 		case Tag.READ:
 			int next_read = code.newLabel();
 			match(Tag.READ);
 			if (look.tag == Tag.ID) {
-				int read_id_addr = st.lookupAddress(((Word) look).lexeme); // controlla se l'ID è già assegnato a un
-																			// indirizzo
+				int read_id_addr = st.lookupAddress(((Word) look).lexeme); // controlla se l'ID è già assegnato a un indirizzo
 				if (read_id_addr == -1) {
 					read_id_addr = count;
 					st.insert(((Word) look).lexeme, count++);
@@ -211,27 +210,26 @@ public class Translator {
 				error("Error in grammar (stat) after read( with " + look);
 			}
 			break;
-
+/*init_case: lable di partenza per il valutatore, che ci sia 'else' oppure no, dopo la valutazione il programma andrà a next_case*/
 		case Tag.COND:
+			int init_case = code.newLabel();
 			int next_case = code.newLabel();
-			code.emitLabel(next_case);
 			match(Tag.COND);
-			bexpr(next_case);
-			stat(next_case);
+			bexpr(init_case);
+			stat(init_case);
+			code.emit(OpCode.GOto, next_case);
+			code.emitLabel(init_case);
+			elseopt(init_case);
+			code.emit(OpCode.GOto, next_case);
 			code.emitLabel(next_case);
-			elseopt(next_case);
 			break;
 
 		case Tag.WHILE:
 
 			match(Tag.WHILE);
-			int lnext_stat_while = code.newLabel(); // begin = newlabel()
-			int ltrue_stat_while = code.newLabel(); // B.true = newlabel()
+			int lnext_stat_while = code.newLabel(); // begin = newlabel() || b.true
 			int end_while = code.newLabel(); // B.false
 			code.emitLabel(lnext_stat_while);
-			// if(ltrue_stat_while!=0) code.emit (OpCode.GOto, ltrue_stat_while);
-			// //controllare che non sia necessario
-			//code.emitLabel(ltrue_stat_while); // emitlabel(begin)
 			bexpr(end_while);
 			stat(lnext_stat_while);
 			code.emit (OpCode.GOto, lnext_stat_while);
@@ -485,10 +483,14 @@ public class Translator {
 
 	public static void main(String[] args) {
 		Lexer lex = new Lexer();
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\B.lft";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\A.lft";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\TestCond.lft";
-		String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\TestWhile.lft";
+		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\A.pas";
+		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\B.pas";
+		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestCond.pas";
+		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestCondNoElse.pas";
+		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestWhile.pas";
+		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\esempio_semplice.pas";
+		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\euclid.pas";
+		String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\factorial.pas";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Translator translator = new Translator(lex, br);
