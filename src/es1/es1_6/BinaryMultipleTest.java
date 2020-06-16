@@ -11,16 +11,13 @@ public class BinaryMultipleTest extends TestCase{
         super.setUp();
         binaryMultiple = new BinaryMultiple();
     }
-
     @Test
-    public void testScanNoThreeZero() throws Exception {
-        assertFalse(binaryMultiple.scan("0011110"));
-        assertFalse(binaryMultiple.scan("010101"));
-        assertFalse(binaryMultiple.scan("10214"));
-    }
-    @Test
-    public void testScanThreeZero() throws Exception {
-        assertTrue(binaryMultiple.scan("10101"));
+    public void testScanBinaryMultiple() throws Exception {
         assertTrue(binaryMultiple.scan("110"));
+        assertTrue(binaryMultiple.scan("1001"));
+        assertTrue(binaryMultiple.scan("0110"));
+        assertFalse(binaryMultiple.scan("0001111"));
+        assertFalse(binaryMultiple.scan("10"));
+        assertFalse(binaryMultiple.scan("111"));
     }
 }

@@ -1,5 +1,12 @@
 package es1.es1_10;
 
+// 0. Progettare e implementare un DFA con alfabeto {/, *, a} che riconosca il linguaggio di “commenti” delimitati da /* (all’inizio) e */ (alla fine): cioe l’automa deve accettare le `
+//stringhe che contengono almeno 4 caratteri che iniziano con /*, che finiscono con */, e che contengono una sola occorrenza della sequenza */, quella finale (dove l’asterisco della sequenza */
+//non deve essere in comune con quello della sequenza /* all’inizio).
+//Esempi di stringhe accettate: “/****/”, “/*a*a*/”, “/*a/**/”, “/**a///a/a**/”, “/**/”,
+//“/*/*/”
+//Esempi di stringhe non accettate: “/*/”, “/**/***/”
+
 public class Comments {
 	public static boolean scan(String str) {
 		int state = 0;

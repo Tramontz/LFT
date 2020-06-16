@@ -17,19 +17,22 @@ public class LabTurnTest extends TestCase{
         super.setUp();
         labTurn = new LabTurn();
     }
-	    @Test
-    public void testScanNoThreeZero() throws Exception {
-	    assertFalse(labTurn.scan("0011110"));
-	    assertFalse(labTurn.scan("01010144ABC"));
-	    assertFalse(labTurn.scan("102145ArOMA"));
-	    assertFalse(labTurn.scan("6543 21Ros si"));
-    }
    @Test
     public void testscantT3() throws Exception {
-	   assertTrue(labTurn.scan("654321Rossi"));	    
+	   assertTrue(labTurn.scan("654321Rossi"));
+	   assertTrue(labTurn.scan("1R"));
+	   assertFalse(labTurn.scan("654321Bianchi"));
+	   assertFalse(labTurn.scan("123456"));
+	   assertFalse(labTurn.scan("Bianchi"));
+	   assertFalse(labTurn.scan("123456Rossi"));
         }
     @Test
     public void testscantT2() throws Exception {
     	assertTrue(labTurn.scan("123456Bianchi"));
+    	assertTrue(labTurn.scan("122B"));
+    	assertTrue(labTurn.scan("2Bianchi"));
+ 	   	assertFalse(labTurn.scan("654321Bianchi"));
+ 	    assertFalse(labTurn.scan("123456"));
+ 	    assertFalse(labTurn.scan("Bianchi"));
     }
 }

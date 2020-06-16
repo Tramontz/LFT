@@ -13,14 +13,11 @@ public class CommentsModifyTest extends TestCase{
         commentsModify = new CommentsModify();
     }
 	    @Test
-    public void testNoThirdA() throws Exception {
+    public void testCommentsModify() throws Exception {
         assertFalse(commentsModify.scan("aaa/*/aa"));
         assertFalse(commentsModify.scan("a/**//***a"));
         assertFalse(commentsModify.scan("*aa/*aa"));
         assertFalse(commentsModify.scan("bbabbbbabbbabbb"));
-    }
-    @Test
-    public void testThirdA() throws Exception {
         assertTrue(commentsModify.scan("aaa/****/aa"));
         assertTrue(commentsModify.scan("aa/*a*a*/"));
         assertTrue(commentsModify.scan("aaaa"));
@@ -31,4 +28,5 @@ public class CommentsModifyTest extends TestCase{
         assertTrue(commentsModify.scan("a/**/***/a"));
         assertTrue(commentsModify.scan("a/**/aa/***/a"));
     }
+
 }

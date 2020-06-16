@@ -1,11 +1,9 @@
-package es4;
+package es2;
 
 import java.io.*;
 import java.util.*;
 
-
-
-public class Lexer {
+public class Lexer2_3 {
 	public static int line = 1;
 	private char peek = ' ';
 
@@ -22,6 +20,33 @@ public class Lexer {
 			if (peek == '\n')
 				line++;
 			readch(br);
+		}
+
+		while (peek == '/') {
+			readch(br);
+			if (peek == '*') {
+				readch(br);
+				while (peek != '/') {
+					while (peek != '*') {
+						readch(br);
+					}
+					readch(br);
+				}
+				readch(br);
+				while (peek == ' ' || peek == '\n' || peek == '\t' || peek == '\r') {
+					if (peek == '\n')
+						line++;
+					readch(br);
+				}
+			} else if (peek == '/') {
+				while (peek != '\n' && peek != (char) -1) {
+					readch(br);
+				}
+				readch(br);
+				line++;
+			} else {
+				return Token.div;
+			}
 		}
 		switch (peek) {
 		case '!':
@@ -48,9 +73,6 @@ public class Lexer {
 		case '*':
 			peek = ' ';
 			return Token.mult;
-		case '/':
-			peek = ' ';
-			return Token.div;
 		case ';':
 			peek = ' ';
 			return Token.semicolon;
@@ -159,9 +181,8 @@ public class Lexer {
 
 //--------------//
 	public static void main(String[] args) {
-		Lexer lex = new Lexer();
-		String path = "E:\\Workspaces\\LFT_lab\\src\\es4\\text.txt"; // il percorso del file da
-																							// leggere
+		Lexer2_3 lex = new Lexer2_3();
+		String path = "E:\\Workspaces\\LFT_lab\\src\\es2\\Es2_3.txt"; // il percorso del file da leggere
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Token tok;

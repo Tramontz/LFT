@@ -1,11 +1,9 @@
-package es4;
+package es2;
 
 import java.io.*;
 import java.util.*;
 
-
-
-public class Lexer {
+public class Lexer2_2 {
 	public static int line = 1;
 	private char peek = ' ';
 
@@ -103,10 +101,9 @@ public class Lexer {
 		case (char) -1:
 			return new Token(Tag.EOF);
 		default:
-			if (Character.isLetter(peek)) {
-				// ... gestire il caso degli identificatori e delle parole chiave //
+			if (Character.isLetter(peek)) { // Letters
 				String tok = "";
-				while (Character.isLetter(peek) || Character.isDigit(peek)) {
+				while (Character.isLetter(peek) || Character.isDigit(peek) || peek == '_') {
 					tok = tok + peek;
 					readch(br);
 				}
@@ -142,15 +139,31 @@ public class Lexer {
 					// peek = ' ';
 					return new Word(257, tok);
 				}
-			} else if (Character.isDigit(peek)) {
-				// ... gestire il caso dei numeri ... //
+			} else if (Character.isDigit(peek)) { // Numbers
 				String num = "";
 				while (Character.isDigit(peek)) {
 					num = num + peek;
 					readch(br);
 				}
 				return new NumberTok(Integer.parseInt(num));
-			} else {
+			} else if (peek == '_') { // Underscore
+				String un = "";
+				while (peek == '_' || Character.isDigit(peek) || Character.isLetter(peek)) {
+					un = un + peek;
+					readch(br);
+				}
+				int isunder = 0;
+				for (int i = 0; i < un.length(); i++) {
+					if (un.charAt(i) == '_') {
+						isunder++;
+					}
+				}
+				if (isunder == un.length()) {
+					System.err.println("Erroneous sequence of characters: ");
+					return null;
+				} else
+					return new Word(257, un);
+			} else { // ERROR
 				System.err.println("Erroneous character: " + peek);
 				return null;
 			}
@@ -159,8 +172,8 @@ public class Lexer {
 
 //--------------//
 	public static void main(String[] args) {
-		Lexer lex = new Lexer();
-		String path = "E:\\Workspaces\\LFT_lab\\src\\es4\\text.txt"; // il percorso del file da
+		Lexer2_2 lex = new Lexer2_2();
+		String path = "E:\\Workspaces\\LFT_lab\\src\\es2\\Es2_2.txt"; // il percorso del file da
 																							// leggere
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));

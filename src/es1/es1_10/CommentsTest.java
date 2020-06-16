@@ -13,19 +13,16 @@ public class CommentsTest extends TestCase{
         comments = new Comments();
     }
 	    @Test
-    public void testNoThirdA() throws Exception {
-        assertFalse(comments.scan("/*/"));
-        assertFalse(comments.scan("/**/***/"));
-        assertFalse(comments.scan("*/"));
-        assertFalse(comments.scan("bbabbbbabbbabbb"));
-    }
-    @Test
-    public void testThirdA() throws Exception {
-        assertTrue(comments.scan("/****/"));
-        assertTrue(comments.scan("/*a*a*/"));
-        assertTrue(comments.scan("/*a/**/"));
-        assertTrue(comments.scan("/**a///a/a**/"));
-        assertTrue(comments.scan("/**/"));
-        assertTrue(comments.scan("/*/*/"));
+    public void testComments() throws Exception {
+	    	assertTrue(comments.scan("/****/"));
+	    	assertTrue(comments.scan("/*a*a*/"));
+	    	assertTrue(comments.scan("/*a/**/"));
+	    	assertTrue(comments.scan("/**a///a/a**/"));
+	    	assertTrue(comments.scan("/**/"));
+	    	assertTrue(comments.scan("/*/*/"));
+	    	assertFalse(comments.scan("/*/"));
+	    	assertFalse(comments.scan("/**/***/"));
+	    	assertFalse(comments.scan("*/"));
+	    	assertFalse(comments.scan("bbabbbbabbbabbb"));
     }
 }

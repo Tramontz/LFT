@@ -1,8 +1,14 @@
-package Esercizio4;
+package es4;
 
 public class NumberTok extends Token {
-    int n = 0;
-    public NumberTok(int s) { super(Tag.NUM); n = s; }
-    public String toString() { return "<" + Tag.NUM + ", " + n + ">"; }
-    
+	public int lexeme;
+
+	public NumberTok(int s) {
+		super(256);
+		lexeme = s;
+	}
+
+	public String toString() {
+		return "<" + tag + ", " + lexeme + ">";
+	}
 }

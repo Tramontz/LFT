@@ -1,361 +1,501 @@
-/*  Laboratorio Linguaggi Formali e Traduttori 17/18  
- *
- *  Autore: Stracci Maicol
- *  
- *  Matricola: 821115 
- *  
- *  Esercizio: Esercizio 5
- *  
- *  Descrizione: Classe Translator
- *               Traduttore per programmi scritti in linguaggio "P".
- *
- *  Output previsto: File output.j utilizzabile dal programma Jasmin per la 
- *                   transormazione in un file .class eseguibile dalla JVM.
- *
- */
-package Esercizio5;
+package es5;
+
+/*
+ *CALCOLO FIRST/FOLLOW/INSIEME GUIDA
+1 	PROG→STAT eof
+2	STATLIST→STAT STATLIST_P
+3	STATLIST_P→STAT STATLIST_P
+4	STATLIST_P→ε
+5	STAT→( STAT_P )
+6	STAT_P→ id EXPR
+7	STAT_P→ cond BEXPR STAT ELSEOPT
+8	STAT_P→ while BEXPR STAT
+9	STAT_P→ do STATLIST
+10	STAT_P→ print EXPRLIST
+11	STAT_P→ read id
+12	ELSEOPT→ ( else STAT )
+13	ELSEOPT→ε
+14	BEXPR→ ( BEXPR_P )
+15	BEXPR_P→ RELOP EXPR EXPR
+16	EXPR→ num 
+17	EXPR→id
+18	EXPR→( EXPR_P )
+19	EXPR_P → + EXPR_LIST
+20	EXPR_P →- EXPR EXPR
+21	EXPR_P → * EXPR_LIST
+22	EXPR_P → / EXPR EXPR
+23	EXPR_LIST→ EXPR EXPR_LIST_P
+24	EXPR_LIST_P→EXPR EXPR_LIST_P
+25	EXPR_LIST_P→ε
+
+*FIRST
+PROG	(
+STATLIST	(
+STATLIST_P	ε (
+STAT	(
+STAT_P	id cond while do print read
+ELSEOPT	( ε
+BEXPR	(
+BEXPR_P	RELOP
+EXPR	num id (
+EXPR_P	+ - * /
+EXPR_LIST	numid (
+EXPR_LIST_P	numid ( ε
+*
+*FOLLOW
+PROG	┤
+STATLIST	)
+STATLIST_P	)
+STAT	eof()
+STAT_P	)
+ELSEOPT	)
+BEXPR	()
+BEXPR_P	
+EXPR	)numid(
+EXPR_P	)
+EXPR_LIST	)
+EXPR_LIST_P	)
+*
+*GUIDA
+1	(
+2	(
+3	(
+4	)
+5	(
+6	id
+7	cond
+8	while
+9	do
+10	print
+11	read
+12	(
+13	)
+14	(
+15	RELOP
+16	num
+17	id
+18	(
+19	+
+20	-
+21	*
+22	/
+23	num id (
+24	num id (
+25	)
+*
+*/
 
 import java.io.*;
 
 public class Translator {
+	private Lexer lex;
+	private BufferedReader pbr;
+	private Token look;
 
-    private Lexer lex;
-    private BufferedReader pbr;
-    private Token look;
+	SymbolTable st = new SymbolTable();
+	CodeGenerator code = new CodeGenerator();
+	int count = 0;
 
-    SymbolTable st = new SymbolTable();
-    CodeGenerator code = new CodeGenerator();
-    int count = 0;
+	public Translator(Lexer l, BufferedReader br) {
+		lex = l;
+		pbr = br;
+		move();
+	}
 
-    public Translator(Lexer l, BufferedReader br) {
-        lex = l;
-        pbr = br;
-        move();
-    }
+	void move() {
+		look = lex.lexical_scan(pbr);
+		System.err.println("token = " + look);
+	}
 
-    void move() {
-        look = lex.lexical_scan(pbr);
-        System.err.println("token = " + look);
-    }
+	void error(String s) {
+		throw new Error("near line " + lex.line + ": " + s);
+	}
 
-    void error(String s) {
-        throw new Error("near line " + lex.line + ": " + s);
-    }
+	void match(int t) {
+		if (look.tag == t) {
+			if (look.tag != Tag.EOF)
+				move();
+		} else
+			error("syntax error, found: " + look);
+	}
 
-    void match(int t) {
-        if (look.tag == t) {
-            if (look.tag != Tag.EOF) {
-                move();
-            }
-        } else {
-            error("syntax error");
-        }
-    }
+	/*
+	 * metodo di partenza GUI (
+	 */
+	public void prog() {
+		int lnext_prog = code.newLabel(); // S.next = newlabel()
+		if (look.tag == '(') {
+			stat(lnext_prog);
+			code.emitLabel(lnext_prog);
+			if (look.tag == Tag.EOF) {
+				match(Tag.EOF);
+			}
+		} else {
+			error("Error in Prog, found: " + look);
+		}
+		try {
+			code.toJasmin();
 
-    public void prog() {
-        if (look.tag == Tag.ID || look.tag == Tag.PRINT || look.tag == Tag.FOR || look.tag == Tag.READ || look.tag == Tag.IF || look.tag == Tag.BEGIN) {
-            int lnext_prog = code.newLabel();
-            statlist(lnext_prog);
-            code.emitLabel(lnext_prog);
-            match(Tag.EOF);
-            try {
-                code.toJasmin();
-            } catch (java.io.IOException e) {
-                System.out.println("IO error\n");
-            };
-        } else {
-            System.out.println("Errore prog");
-        }
-    }
+		} catch (java.io.IOException e) {
+			System.out.println("IO error\n");
+		}
+		;
+	}
 
-    public void stat(int lnext) {
-        if (look.tag == Tag.ID || look.tag == Tag.PRINT || look.tag == Tag.FOR || look.tag == Tag.READ || look.tag == Tag.IF || look.tag == Tag.BEGIN) {
-            switch (look.tag) {
+	/*
+	 * GUIDA: '('
+	 * 
+	 */
+	public void stat(int lnext) {
+		if (look.tag == '(') {
+			match(look.tag);
+			stat_p(lnext);
+			match(')');
+		} else
+			error("Error in stat, found: " + look);
+	}
 
-                case Tag.PRINT:
-                    match(Tag.PRINT);
-                    match('(');
-                    expr();
-                    code.emit(OpCode.invokestatic, 1);
-                    match(')');
-                    break;
-                case Tag.READ:
-                    match(Tag.READ);
-                    match('(');
-                    if (look.tag == Tag.ID) {
-                        int read_id_addr = st.lookupAddress(((Word) look).lexeme);
-                        if (read_id_addr == -1) {
-                            read_id_addr = count;
-                            st.insert(((Word) look).lexeme, count++);
-                        }
-                        match(Tag.ID);
-                        match(')');
-                        code.emit(OpCode.invokestatic, 0);
-                        code.emit(OpCode.istore, read_id_addr);
-                    } else {
-                        error("Error in grammar (stat) after read( with " + look);
-                    }
-                    break;
-                case Tag.ID:
-                    int read_id_addr = st.lookupAddress(((Word) look).lexeme);
-                    Word ID = (Word) look;
-                    match(Tag.ID);
-                    match('=');
-                    expr();
-                    if (read_id_addr == -1) {
-                        read_id_addr = count;
-                        st.insert(ID.lexeme, count++);
-                    }
-                    code.emit(OpCode.istore, read_id_addr);
-                    break;
-                case Tag.FOR:
-                    match(Tag.FOR);
-                    match('(');
-                    //Legge id e lo salva
-                    int read_id_addrf = st.lookupAddress(((Word) look).lexeme);
-                    Word Id = (Word) look;
-                    match(Tag.ID);
-                    match('=');
-                    expr();
-                    if (read_id_addrf == -1) {
-                        read_id_addrf = count;
-                        st.insert(Id.lexeme, count++);
-                    }
-                    code.emit(OpCode.istore, read_id_addrf);
+	/*
+	 * il metodo stat_p() si occupa di guardare le istruzioni chiave della
+	 * grammatica in oggetto GUIDA:id cond while do print read ID:=<expr>* COND
+	 * <bexpr>, <stat> <elseopt> WHILE <bexpr> <stat> DO(<statlist>) print
+	 * <ExprList> read ID
+	 * 
+	 */
 
-                    match(';');
+	public void stat_p(int lnext) {
 
-                    int lprev = code.newLabel();
-                    int ltrue1 = code.newLabel();
-                    lnext = code.newLabel();
+		switch (look.tag) {
+		case '=':
+			match('=');
+			if (look.tag == Tag.ID) {
+				int next_id = code.newLabel();
+				int id_addr = st.lookupAddress(((Word) look).lexeme); // controlla se l'ID è già assegnato a un
+																		// indirizzo
+				if (id_addr == -1) {
+					id_addr = count; // count = 0
+					st.insert(((Word) look).lexeme, count++); // inserisce in un nuovo indirizzo l'ID
+				}
+				match(Tag.ID);
+				expr();
+				code.emit(OpCode.istore, id_addr); // CodeGenerator emette l'istruzione assegnata
+				code.emitLabel(next_id);
+			} else {
+				error("Error in grammar (stat) after ID, found " + look);
+			}
+			break;
 
-                    code.emit(OpCode.iload, read_id_addrf);
-                    code.emitLabel(lprev);
-                    //Controllo fra id e espressione
-                    b_expr(ltrue1, lnext);
-                    //Se espressione falsa salta a lnext
-                    code.emit(OpCode.GOto, lnext);
-                    //Se espressione vera fai di seguito
-                    code.emitLabel(ltrue1);
-                    match(')');
-                    match(Tag.DO);
-                    stat(lnext);
-                    //aumento di uno il valore di ID
-                    code.emit(OpCode.iload, read_id_addrf);
-                    code.emit(OpCode.ldc, 1);
-                    code.emit(OpCode.iadd);
-                    code.emit(OpCode.istore, read_id_addrf);
-                    code.emit(OpCode.GOto, lprev); // Torno in cima per ricontrollare l' espressione
+		case Tag.PRINT:
+			int next_print = code.newLabel();
+			match(Tag.PRINT);
+			exprlist();
+			code.emit(OpCode.invokestatic, 1); // 1 == invoca la funzione print
+			code.emitLabel(next_print);
+			break;
 
-                    code.emitLabel(lnext); 
+		case Tag.READ:
+			int next_read = code.newLabel();
+			match(Tag.READ);
+			if (look.tag == Tag.ID) {
+				int read_id_addr = st.lookupAddress(((Word) look).lexeme); // controlla se l'ID è già assegnato a un
+																			// indirizzo
+				if (read_id_addr == -1) {
+					read_id_addr = count;
+					st.insert(((Word) look).lexeme, count++);
+				}
+				match(Tag.ID);
+				code.emit(OpCode.invokestatic, 0); // 0 == invoca la funzione read
+				code.emit(OpCode.istore, read_id_addr);
+				code.emitLabel(next_read);
+			} else {
+				error("Error in grammar (stat) after read( with " + look);
+			}
+			break;
 
-                    break;
-                case Tag.IF:
-                    match(Tag.IF);
+		case Tag.COND:
+			int next_case = code.newLabel();
+			code.emitLabel(next_case);
+			match(Tag.COND);
+			bexpr(next_case);
+			stat(next_case);
+			code.emitLabel(next_case);
+			elseopt(next_case);
+			break;
 
-                    int ltrue = code.newLabel();
-                    lnext = code.newLabel();
-                    b_expr(ltrue, lnext);       // Se b_expr == TRUE salta a ltrue
-                    code.emit(OpCode.GOto, lnext); // se b_expr == FALSE salta a lfalse 
-                    code.emitLabel(ltrue);
-                    match(Tag.THEN);
-                    stat(lnext);
-                    if (look == Word.elsetok) {
-                        int lfalse = lnext;
-                        lnext = code.newLabel();
-                        code.emit(OpCode.GOto, lnext);
-                        match(Tag.ELSE);
+		case Tag.WHILE:
 
-                        code.emitLabel(lfalse);
-                        stat(lnext);
-                        code.emitLabel(lnext);
-                    } else {
-                        code.emitLabel(lnext);
-                    }
-                    break;
-                case Tag.BEGIN:
-                    match(Tag.BEGIN);
-                    statlist(lnext);
-                    match(Tag.END);
-                    break;
+			match(Tag.WHILE);
+			int lnext_stat_while = code.newLabel(); // begin = newlabel()
+			int ltrue_stat_while = code.newLabel(); // B.true = newlabel()
+			int end_while = code.newLabel(); // B.false
+			code.emitLabel(lnext_stat_while);
+			// if(ltrue_stat_while!=0) code.emit (OpCode.GOto, ltrue_stat_while);
+			// //controllare che non sia necessario
+			//code.emitLabel(ltrue_stat_while); // emitlabel(begin)
+			bexpr(end_while);
+			stat(lnext_stat_while);
+			code.emit (OpCode.GOto, lnext_stat_while);
+			code.emitLabel(end_while);
+			break;
 
-            }
-        } else {
-            System.out.println("Errore stat");
-        }
-    }
+		case Tag.DO:
+			match(Tag.DO);
+			statlist(lnext);
+			break;
+		}
+	}
 
-    private void statlist(int lnext) {
+	/*
+	 * Guida: '(' Guida(eps): ')'
+	 */
+	public void statlist_p(int lnext) {
+		if (look.tag == '(') {
+			// match(look.tag);
+			stat(lnext);
+			statlist_p(lnext);
+		} else if (look.tag == ')') {
 
-        if (look.tag == Tag.ID || look.tag == Tag.PRINT || look.tag == Tag.FOR || look.tag == Tag.READ || look.tag == Tag.IF || look.tag == Tag.BEGIN) {
+		} // do notthing, epsilon
 
-            stat(lnext);
-            statlist_p(lnext);
-            lnext = code.newLabel();
-            code.emitLabel(lnext);
+		else {
+			error("Error in statlist_p, found " + look);
+		}
+	}
 
-        } else {
-            System.out.println("Errore statlist");
-        }
-    }
+	/*
+	 * * Guida: '('
+	 */
+	public void statlist(int lnext) {
+		if (look.tag == '(') { // ;
+			stat(lnext);
+			statlist_p(lnext);
+		} else
+			error("Error in statlist, found: " + look);
+	}
 
-    private void statlist_p(int lnext) {
-        if (look.tag == ';' || look.tag == Tag.EOF || look.tag == Tag.END) {
+	/*
+	 * gestisce la keyword ELSE GUIDA '(' GUIDA(eps): ')'
+	 */
+	public void elseopt(int lnext) {
+		if (look.tag == '(') {
+			match(look.tag);
+			if (look.tag == Tag.ELSE) {
+				int itrue = code.newLabel(); // B.true = newlabel()
+				match(look.tag);
+				stat(lnext);
+				if (look.tag != ')') { // )
+					error("Erroneous character after elseopt, expected ) but found: " + look);
+				} else
+					match(look.tag);
+			} else
+				error("Error in Else, found: " + look);
+		} else if (look.tag == ')') {
+			// do notthing, epsilon
+		}
+	}
 
-            if (look.tag == ';') {
-                match(';');
-                lnext = code.newLabel();
-                code.emitLabel(lnext);
-                stat(lnext);
-                statlist_p(lnext);
+	/*
+	 * GUIDA '('
+	 */
+	public void bexpr(int lnext) {
 
-            }
-        } else {
-            System.out.println("Errore statlist_p");
-        }
-    }
+		int Itrue = code.newLabel(); // B.true = newlabel()
+		int next_when = code.newLabel(); // B.false = newlabel()
+		if (look.tag == '(') { // (
+			match(look.tag);
+			bexpr_p(Itrue, next_when);
+			if (look.tag != ')') { // )
+				error("Erroneous character after bexpr, expected ) but found: " + look);
+			} else {
+				match(look.tag);
+				code.emitLabel(next_when); // emitlabel(B.true)
+				code.emit(OpCode.GOto, lnext); // emit('goto' S1.next)
+				code.emitLabel(Itrue); // emitlabel(B.false)
+			}
+		} else {
+			error("Error in WhenItem, found: " + look);
+		}
+	}
 
-    private void expr() {
-        if (look.tag == '(' || look.tag == Tag.NUM || look.tag == Tag.ID) {
-            term();
-            exprp();
-        } else {
-            System.out.println("Errore expr");
-        }
-    }
+	/*
+	 * BEXPR_P→ RELOP EXPR EXPR GUIDA relop
+	 */
 
-    private void b_expr(int ltrue, int lfalse) {
-        if (look.tag == '(' || look.tag == Tag.NUM || look.tag == Tag.ID) {
-            expr();
-            if (look == Word.eq) {
-                match(Tag.RELOP);
-                expr();
-                code.emit(OpCode.if_icmpeq, ltrue);
+	public void bexpr_p(int ltrue, int lfalse) {
+		if (look.tag == Tag.RELOP) {
+			if (look == Word.eq) {
+				match(Tag.RELOP);
+				expr();
+				expr();
+				code.emit(OpCode.if_icmpeq, ltrue); // emit('if_icmpep', B.true)
+				code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
+			} else if (look == Word.ne) {
+				match(Tag.RELOP);
+				expr();
+				expr();
+				code.emit(OpCode.if_icmpne, ltrue); // emit('if_icmpne', B.true)
+				code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
+			} else if (look == Word.le) {
+				match(Tag.RELOP);
+				expr();
+				expr();
+				code.emit(OpCode.if_icmple, ltrue); // emit('if_icmple', B.true)
+				code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
+			} else if (look == Word.ge) {
+				match(Tag.RELOP);
+				expr();
+				expr();
+				code.emit(OpCode.if_icmpge, ltrue); // emit('if_icmpge', B.true)
+				code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
+			} else if (look == Word.lt) {
+				match(Tag.RELOP);
+				expr();
+				expr();
+				code.emit(OpCode.if_icmplt, ltrue); // emit('if_icmplt', B.true)
+				code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
+			} else if (look == Word.gt) {
+				match(Tag.RELOP);
+				expr();
+				expr();
+				code.emit(OpCode.if_icmpgt, ltrue); // emit('if_icmpgt', B.true)
+				code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
+			}
+		} else {
+			error("Erroneous character in bexpr_p: invalid boolean expression");
+		}
+	}
 
-            }
-            if (look == Word.ne) {
-                match(Tag.RELOP);
-                expr();
-                code.emit(OpCode.if_icmpne, ltrue);
+	/*
+	 * EXPR→ num EXPR→id EXPR→( EXPR_P )
+	 * 
+	 * GUIDA num id '('
+	 */
+	private void expr() {
+		switch (look.tag) {
+		case Tag.NUM:
+			int costant = (((NumberTok) look).lexeme);
+			code.emit(OpCode.ldc, costant); // emit(ldc(NUM))
+			match(Tag.NUM);
+			if (look.tag == '(') {
+				error("Error in grammar expr, found: num(");
+			}
+			break;
 
-            }
-            if (look == Word.ge) {
-                match(Tag.RELOP);
-                expr();
-                code.emit(OpCode.if_icmpge, ltrue);
+		case Tag.ID:
+			int id_addr = st.lookupAddress(((Word) look).lexeme);
+			code.emit(OpCode.iload, id_addr); // emit(addr(id.lessema))
+			match(Tag.ID);
+			break;
 
-            }
-            if (look == Word.le) {
-                match(Tag.RELOP);
-                expr();
-                code.emit(OpCode.if_icmple, ltrue);
+		case '(':
+			match(look.tag);
+			expr_p();
+			if (look.tag == ')') {
+				match(look.tag);
+			}
+			break;
+		}
+	}
+	/*
+	 * EXPR_P → + EXPR_LIST EXPR_P →- EXPR EXPR EXPR_P → * EXPR_LIST EXPR_P → / EXPR
+	 * EXPR
+	 * 
+	 * GUIDA + - * /
+	 */
 
-            }
-            if (look == Word.gt) {
-                match(Tag.RELOP);
-                expr();
-                code.emit(OpCode.if_icmpgt, ltrue);
+	private void expr_p() {
+		switch (look.tag) {
+		case '+':
+			match('+');
+			/*
+			 * if(look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID){
+			 * error("Erroneous character after '+', found " + look); }
+			 */
+			expr();
+			exprlist();
+			code.emit(OpCode.iadd);
 
-            }
-            if (look == Word.lt) {
-                match(Tag.RELOP);
-                expr();
-                code.emit(OpCode.if_icmplt, ltrue);
+			break;
 
-            }
-        } else {
-            System.out.println("Errore b_expr");
-        }
-    }
+		case '-':
+			match('-');
+			/*
+			 * if(look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID){
+			 * error("Erroneous character after '-', found " + look); }
+			 */
+			expr();
+			expr();
+			code.emit(OpCode.isub);
+			break;
+		case '*':
+			match('*');
+			if (look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID) {
+				error("Erroneous character after '*', found " + look);
+			}
+			exprlist();
+			code.emit(OpCode.imul);
+			break;
 
-    private void exprp() {
-        if (look.tag == '+' || look.tag == '-' || look.tag == ')' || look.tag == Tag.THEN || look.tag == Tag.ELSE || look.tag == Tag.END || look.tag == Tag.EOF || look.tag == Tag.RELOP || look.tag == ';') {
+		case '/':
+			match('/');
+			if (look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID) {
+				error("Erroneous character after '/', found " + look);
+			}
+			expr();
+			expr();
+			code.emit(OpCode.idiv);
+			break;
 
-            switch (look.tag) {
-                case '+':
-                    match('+');
-                    term();
-                    code.emit(OpCode.iadd);
-                    exprp();
-                    break;
-                case '-':
-                    match('-');
-                    term();
-                    code.emit(OpCode.isub);
-                    exprp();
-                    break;
+		default:
+			error("Erroneous character in Exprp, found " + look);
+		}
+	}
 
-            }
-        } else {
-            System.out.println("Errore expr");
-        }
-    }
+	/*
+	 * EXPR_LIST→ EXPR EXPR_LIST_P
+	 * 
+	 * GUIDA: num id (
+	 */
+	private void exprlist() {
+		if (look.tag == '(' || look.tag == Tag.NUM || look.tag == Tag.ID) {
+			// match(look.tag);
+			expr();
+			exprlist_p();
+		} else {
+			error("Error in exprlist, found " + look);
+		}
+	}
 
-    private void term() {
-        if (look.tag == '(' || look.tag == Tag.NUM || look.tag == Tag.ID) {
+	/*
+	 * EXPR_LIST_P→EXPR EXPR_LIST_P EXPR_LIST_P→ε
+	 * 
+	 * GUIDA num ID '(' GUIDA(eps): ')'
+	 */
+	private void exprlist_p() {
+		if (look.tag == '(' || look.tag == Tag.NUM || look.tag == Tag.ID) {
+			expr();
+			exprlist_p();
+		}
+		if (look.tag == ')') {
+			// epsilon, do notthing
+		} else {
+			error("Error in exprlist_p, found " + look);
+		}
+	}
 
-            fact();
-            termp();
-        } else {
-            System.out.println("Errore term");
-        }
-    }
-
-    private void termp() {
-        if (look.tag == '/' || look.tag == '*' || look.tag == '+' || look.tag == '-' || look.tag == ')' || look.tag == Tag.THEN || look.tag == Tag.ELSE || look.tag == Tag.END || look.tag == Tag.EOF || look.tag == Tag.RELOP || look.tag == ';') {
-
-            switch (look.tag) {
-                case '*':
-                    match('*');
-                    term();
-                    code.emit(OpCode.imul);
-                    exprp();
-                    break;
-                case '/':
-                    match('/');
-                    term();
-                    code.emit(OpCode.idiv);
-                    exprp();
-                    break;
-            }
-        } else {
-            System.out.println("Errore termp");
-        }
-    }
-
-    private void fact() {
-        if (look.tag == '(' || look.tag == Tag.NUM || look.tag == Tag.ID) {
-            if (look.tag == '(') {
-                match('(');
-                expr();
-                match(')');
-
-            } else if (look.tag == Tag.NUM) {
-                NumberTok x = (NumberTok) look;
-                int num = x.n;
-                code.emit(OpCode.ldc, num);
-                move();
-            } else if (look.tag == Tag.ID) {
-                int read_id_addr = st.lookupAddress(((Word) look).lexeme);
-                match(Tag.ID);
-                code.emit(OpCode.iload, read_id_addr);
-            }
-        } else {
-            System.out.println("Errore fact");
-        }
-    }
-
-    public static void main(String[] args) {
-        Lexer lex = new Lexer();
-
-        String path = "C:\\Users\\maico\\Desktop\\LFT\\LFT\\Esercizio5\\Test.pas"; // il percorso del file da leggere
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(path));
-            Translator translator = new Translator(lex, br);
-            translator.prog();
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	public static void main(String[] args) {
+		Lexer lex = new Lexer();
+		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\B.lft";
+		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\A.lft";
+		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\TestCond.lft";
+		String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\TestWhile.lft";
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(path));
+			Translator translator = new Translator(lex, br);
+			translator.prog();
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

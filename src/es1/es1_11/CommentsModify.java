@@ -1,7 +1,14 @@
 package es1.es1_11;
 
-
-/*da chiedere al professore*/
+/*
+ * Modificare l’automa dell’esercizio precedente in modo che riconosca il linguaggio di stringhe (sull’alfabeto {/, *, a}) che contengono “commenti” delimitati da /* e * /, ma con
+la possibilita di avere stringhe prima e dopo come specificato qui di seguito. L’idea ` e che sia `
+possibile avere eventualmente commenti (anche multipli) immersi in una sequenza di simboli
+dell’alfabeto. Quindi l’unico vincolo e che l’automa deve accettare le stringhe in cui un’occorren- `
+za della sequenza /* deve essere seguita (anche non immediatamente) da un’occorrenza della
+sequenza * /. Le stringhe del linguaggio possono non avere nessuna occorrenza della sequenza
+/* (caso della sequenza di simboli senza commenti). Implementare l’automa seguendo la costruzione vista in Listing 1
+ */
 
 public class CommentsModify {
 	public static boolean scan(String str) {

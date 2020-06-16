@@ -1,46 +1,84 @@
 package es1.es1_3;
 
+/*
+ * Progettare e implementare un DFA che riconosca il linguaggio di stringhe che
+contengono un numero di matricola seguito (subito) da un cognome, dove la combinazione di
+matricola e cognome corrisponde a studenti del turno 2 o del turno 3 del laboratorio di Linguaggi
+Formali e Traduttori. Si ricorda le regole per suddivisione di studenti in turni:
+• Turno T1: cognomi la cui iniziale e compresa tra A e K, e il numero di matricola ` e dispari; `
+• Turno T2: cognomi la cui iniziale e compresa tra A e K, e il numero di matricola ` e pari; `
+• Turno T3: cognomi la cui iniziale e compresa tra L e Z, e il numero di matricola ` e dispari; `
+• Turno T4: cognomi la cui iniziale e compresa tra L e Z, e il numero di matricola ` e pari.
+ */
+
 public class LabTurn {
-	public static boolean scan(String str) {
+/* PARI */
+	private static boolean even(char ch) {
+		return (ch%2)==0;
+	}
+/* A..k */
+	private static boolean ak(char ch){
+		return (ch >= 'A' && ch <= 'K') || (ch >= 'a' && ch <= 'k');
+	}
+
+/* L..z */
+	private static boolean lz(char ch) {
+		return (ch >= 'L' && ch <= 'Z') || (ch >= 'l' && ch <= 'z');
+	}
+
+	public static boolean scan(String s) {
 		int state = 0;
 		int i = 0;
-		for (char c : str.toCharArray()) {
-			i++;
-			switch (state) { 
-			case 0:
-				if (Character.isDigit(c) && i<=5)
-					state= 0;
-				else if(Character.isDigit(c) && (c%2)!=0)
-					state=1;
-				else if(Character.isDigit(c) && (c%2)==0)
-					state=2;					
-				else
-					state=-1;
-					break;
-			case 1:
-				if(Character.isAlphabetic(c) &&c>='L' && c<='Z')
-					state=3;
-				else 
-					state=-1;
-					break;
-			case 2:
-				if(Character.isAlphabetic(c) && c>='A' && c<='K')
-					state=3;
-				else 
-					state=-1;
-					break;
-			case 3: 
-				if(Character.isAlphabetic(c))
-					state=3;
-				else
-					state = -1;
-					break;	
+		while (state >= 0 && i < s.length()) {
+			final char ch = s.charAt(i++);
+			switch (state) {
+        	case 0: // stato iniziale q0
+                if(Character.isDigit(ch) && even(ch))
+                    state = 1;
+                else if (Character.isDigit(ch) && !even(ch))
+                    state = 2;
+                else
+                    state = -1;
+                break;
+            case 1: // stato q1
+                if(Character.isDigit(ch) && even(ch))
+                    state = 1;
+                else if (Character.isDigit(ch) && !even(ch))
+                    state = 2;
+                else if(ak(ch)) // A..k
+                    state = 3;
+                else
+                    state = -1;
+                break;
+            case 2: // stato q2
+                if(Character.isDigit(ch) && even(ch))
+                    state = 1;
+                else if (Character.isDigit(ch) && !even(ch))
+                    state = 2;
+                else if(lz(ch)) // L..z
+                    state = 4;
+                else
+                    state = -1;
+                break;
+            case 3: // stato q3
+                if (Character.isLetter(ch)) // A..z
+                    state = 3;
+                else
+                    state = -1;
+                break;
+            case 4:	// stato q4
+                if (Character.isLetter(ch)) // A..z
+                state = 4;
+                else
+                    state = -1;
+                break;
 			}
 		}
-		return state == 3;
+		return ((state == 3) || (state == 4));
 	}
 
 	public static void main(String[] args) {
 		System.out.println(scan(args[0]) ? "OK" : "NOPE");
-	}
+	}	
 }
+
