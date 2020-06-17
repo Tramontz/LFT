@@ -1,4 +1,4 @@
-package es5;
+package es5_2;
 
 import java.io.*;
 

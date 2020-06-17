@@ -1,4 +1,4 @@
-package es5;
+package es5_1;
 
 /*
  *CALCOLO FIRST/FOLLOW/INSIEME GUIDA
@@ -210,11 +210,11 @@ public class Translator {
 				error("Error in grammar (stat) after read( with " + look);
 			}
 			break;
-			
 /*init_case: lable di partenza per il valutatore, che ci sia 'else' oppure no, dopo la valutazione il programma andrà a next_case*/
 		case Tag.COND:
 			int init_case = code.newLabel();
 			int next_case = code.newLabel();
+
 			match(Tag.COND);
 			bexpr(init_case);
 			stat(init_case);
@@ -245,8 +245,7 @@ public class Translator {
 	}
 
 	/*
-	 * Guida: '(' 
-	 * Guida(eps): ')'
+	 * Guida: '(' Guida(eps): ')'
 	 */
 	public void statlist_p(int lnext) {
 		if (look.tag == '(') {
@@ -274,8 +273,8 @@ public class Translator {
 	}
 
 	/*
-	 * gestisce la keyword ELSE GUIDA '(' 
-	 * GUIDA(eps): ')'
+	 * gestisce la keyword ELSE 
+	 * GUIDA '(' GUIDA(eps): ')'
 	 */
 	public void elseopt(int lnext) {
 		if (look.tag == '(') {
@@ -298,19 +297,16 @@ public class Translator {
 	 * GUIDA '('
 	 */
 	public void bexpr(int lnext) {
-
-		int Itrue = code.newLabel(); // B.true = newlabel()
 		int next_when = code.newLabel(); // B.false = newlabel()
-		if (look.tag == '(') { // (
+		if (look.tag == '(') {
 			match(look.tag);
-			bexpr_p(Itrue, next_when);
-			if (look.tag != ')') { // )
+			bexpr_p(next_when,lnext); //inverto lnext e next_when in modo che la condizione vera sia la prima ad essere analizzata dopo il compare
+			if (look.tag != ')') {
 				error("Erroneous character after bexpr, expected ) but found: " + look);
 			} else {
 				match(look.tag);
-				code.emitLabel(next_when); // emitlabel(B.true)
 				code.emit(OpCode.GOto, lnext); // emit('goto' S1.next)
-				code.emitLabel(Itrue); // emitlabel(B.false)
+				code.emitLabel(next_when); // emitlabel(B.true)				
 			}
 		} else {
 			error("Error in WhenItem, found: " + look);
@@ -328,37 +324,37 @@ public class Translator {
 				expr();
 				expr();
 				code.emit(OpCode.if_icmpeq, ltrue); // emit('if_icmpep', B.true)
-				code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
+				//code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
 			} else if (look == Word.ne) {
 				match(Tag.RELOP);
 				expr();
 				expr();
 				code.emit(OpCode.if_icmpne, ltrue); // emit('if_icmpne', B.true)
-				code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
+				//code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
 			} else if (look == Word.le) {
 				match(Tag.RELOP);
 				expr();
 				expr();
 				code.emit(OpCode.if_icmple, ltrue); // emit('if_icmple', B.true)
-				code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
+				//code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
 			} else if (look == Word.ge) {
 				match(Tag.RELOP);
 				expr();
 				expr();
 				code.emit(OpCode.if_icmpge, ltrue); // emit('if_icmpge', B.true)
-				code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
+				//code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
 			} else if (look == Word.lt) {
 				match(Tag.RELOP);
 				expr();
 				expr();
 				code.emit(OpCode.if_icmplt, ltrue); // emit('if_icmplt', B.true)
-				code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
+				//code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
 			} else if (look == Word.gt) {
 				match(Tag.RELOP);
 				expr();
 				expr();
-				code.emit(OpCode.if_icmpgt, ltrue); // emit('if_icmpgt', B.true)
-				code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
+				code.emit(OpCode.if_icmpgt,ltrue); // emit('if_icmpgt', B.true)
+				//code.emit(OpCode.GOto, lfalse); // emit('goto' B.false)
 			}
 		} else {
 			error("Erroneous character in bexpr_p: invalid boolean expression");
@@ -491,8 +487,8 @@ public class Translator {
 		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestCondNoElse.pas";
 		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestWhile.pas";
 		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\esempio_semplice.pas";
-		String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\euclid.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\factorial.pas";
+		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\euclid.pas";
+		String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\factorial.pas";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Translator translator = new Translator(lex, br);
