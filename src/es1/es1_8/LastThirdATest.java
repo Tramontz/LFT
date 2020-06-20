@@ -1,29 +1,35 @@
 package es1.es1_8;
 
+/*
+Esempi di stringhe accettate: “abb”, “bbaba”, “baaaaaaa”, “aaaaaaa”, “a”, “ba”, “bba”,
+“aa”, “bbbababab”
+Esempi di stringhe non accettate: “abbbbbb”, “bbabbbbbbbb”, “b”
+*/
 
 import junit.framework.TestCase;
 import org.junit.Test;
 
-public class LastThirdATest extends TestCase{
+public class LastThirdATest extends TestCase {
 
-	LastThirdA lastthirdA;
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        lastthirdA = new LastThirdA();
-    }
-	    @Test
-    public void testNoThirdA() throws Exception {
-        assertFalse(lastthirdA.scan("abbbbbb"));
-        assertFalse(lastthirdA.scan("b"));
-        assertFalse(lastthirdA.scan("bbabbbbbbbb"));
-        assertFalse(lastthirdA.scan("bbabbbbabbbabbb"));
-    }
-    @Test
-    public void testThirdA() throws Exception {
-        assertTrue(lastthirdA.scan("bbaba"));
-        assertTrue(lastthirdA.scan("a"));
-        assertTrue(lastthirdA.scan("ba"));
-        assertTrue(lastthirdA.scan("bbbababab"));
-    }
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+	}
+
+	@Test
+	public void testThirdA() throws Exception {
+		assertTrue(LastThirdA.scan("abb"));
+		assertTrue(LastThirdA.scan("bbaba"));
+		assertTrue(LastThirdA.scan("baaaaaaa"));
+		assertTrue(LastThirdA.scan("aaaaaaa"));
+		assertTrue(LastThirdA.scan("a"));
+		assertTrue(LastThirdA.scan("ba"));
+		assertTrue(LastThirdA.scan("bba"));
+		assertTrue(LastThirdA.scan("aa"));
+		assertTrue(LastThirdA.scan("bbbababab"));
+		assertFalse(LastThirdA.scan("abbbbbb"));
+		assertFalse(LastThirdA.scan("b"));
+		assertFalse(LastThirdA.scan("bbabbbbbbbb"));
+		assertFalse(LastThirdA.scan("bbabbbbabbbabbb"));
+	}
 }

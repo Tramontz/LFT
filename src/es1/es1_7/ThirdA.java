@@ -2,7 +2,7 @@ package es1.es1_7;
 
 /*
  * Progettare e implementare un DFA con alfabeto {a, b} che riconosca il linguaggio
-delle stringhe tali che a occorre almeno una volta in una delle prime tre posizioni della stringa.
+delle stringhe tali che 'a' occorre almeno una volta in una delle prime tre posizioni della stringa.
 Il DFA deve accettare anche stringhe che contengono meno di tre simboli (ma almeno uno dei
 simboli deve essere a).
 Esempi di stringhe accettate: “abb”, “abbbbbb”, “bbaba”, “baaaaaaa”, “aaaaaaa”, “a”, “ba”,

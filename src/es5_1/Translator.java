@@ -1,62 +1,77 @@
 package es5_1;
 
-/*
- *CALCOLO FIRST/FOLLOW/INSIEME GUIDA
-1 	PROG→STAT eof
-2	STATLIST→STAT STATLIST_P
-3	STATLIST_P→STAT STATLIST_P
-4	STATLIST_P→ε
-5	STAT→( STAT_P )
-6	STAT_P→ id EXPR
-7	STAT_P→ cond BEXPR STAT ELSEOPT
-8	STAT_P→ while BEXPR STAT
-9	STAT_P→ do STATLIST
-10	STAT_P→ print EXPRLIST
-11	STAT_P→ read id
-12	ELSEOPT→ ( else STAT )
-13	ELSEOPT→ε
-14	BEXPR→ ( BEXPR_P )
-15	BEXPR_P→ RELOP EXPR EXPR
-16	EXPR→ num 
-17	EXPR→id
-18	EXPR→( EXPR_P )
-19	EXPR_P → + EXPR_LIST
-20	EXPR_P →- EXPR EXPR
-21	EXPR_P → * EXPR_LIST
-22	EXPR_P → / EXPR EXPR
-23	EXPR_LIST→ EXPR EXPR_LIST_P
-24	EXPR_LIST_P→EXPR EXPR_LIST_P
-25	EXPR_LIST_P→ε
+/*Esercizio 5.1 bis (Facoltativo)
+� Modificare lo SDT e l�implementazione della
+classe Translator in modo tale che nessuna
+istruzione goto sia generata dal metodo bexprp.
+� Si noti che questa modifica � possibile grazie
+alla particolarit� delle istruzioni cond e while.
+� Cio� nel caso in cui la condizione <bexpr> �
+soddisfatta lo <stat> da eseguire segue
+direttamente <bexpr>.
+*/
 
-*FIRST
+
+/*CALCOLO FIRST/FOLLOW/INSIEME GUIDA
+1 	PROG->STAT eof
+2	STATLIST->STAT STATLIST_P
+3	STATLIST_P->STAT STATLIST_P
+4	STATLIST_P-> eps
+5	STAT->( STAT_P )
+6	STAT_P-> id EXPR
+7	STAT_P-> cond BEXPR STAT ELSEOPT
+8	STAT_P-> while BEXPR STAT
+9	STAT_P-> do STATLIST
+10	STAT_P-> print EXPRLIST
+11	STAT_P-> read id
+12	ELSEOPT-> ( else STAT )
+13	ELSEOPT->eps
+14	BEXPR-> ( BEXPR_P )
+15	BEXPR_P-> relop EXPR EXPR
+16	EXPR-> num 
+17	EXPR->id
+18	EXPR->( EXPR_P )
+19	EXPR_P -> + EXPRLIST
+20	EXPR_P ->- EXPR EXPR
+21	EXPR_P -> * EXPR_LIST
+22	EXPR_P -> / EXPR EXPR
+23	EXPR_LIST-> EXPR EXPR_LIST_P
+24	EXPR_LIST_P->EXPR EXPR_LIST_P
+25	EXPR_LIST_P->eps
+
+*FIRST SET
+*
 PROG	(
 STATLIST	(
-STATLIST_P	ε (
+STATLIST_P	eps(
 STAT	(
-STAT_P	id cond while do print read
-ELSEOPT	( ε
+STAT_P	idcondwhiledoprintread
+ELSEOPT	(eps
 BEXPR	(
 BEXPR_P	RELOP
-EXPR	num id (
+EXPR	numid(
 EXPR_P	+ - * /
-EXPR_LIST	numid (
-EXPR_LIST_P	numid ( ε
+EXPR_LIST	numid(
+EXPR_LIST_P	numid(eps
 *
-*FOLLOW
-PROG	┤
+*
+*FOLLOW SET
+PROG	-|
 STATLIST	)
 STATLIST_P	)
 STAT	eof()
 STAT_P	)
 ELSEOPT	)
-BEXPR	()
-BEXPR_P	
+BEXPR	(
+BEXPR_P	)
 EXPR	)numid(
 EXPR_P	)
 EXPR_LIST	)
 EXPR_LIST_P	)
+
 *
 *GUIDA
+*
 1	(
 2	(
 3	(
@@ -79,10 +94,10 @@ EXPR_LIST_P	)
 20	-
 21	*
 22	/
-23	num id (
-24	num id (
+23	numid(
+24	numid(
 25	)
-*
+
 */
 
 import java.io.*;

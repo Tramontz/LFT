@@ -9,27 +9,32 @@ accettare la stringa “Paolo” (cioe il nome scritto correttamente), ma anche le s
 “Eva”, “Perro”, “Pietro” oppure “P*o*o”
  */
 
-public class MyName {
+/*Il DFA apposito per FABIO prevedeva una serie di stati dopo ogni lettera, che in caso fosse giusta passassero ad uno stato successivo, se fosse stata
+ una lettera diversa dall'originale, con una serie successiva di stati controllava che le lettere in sequenza fossero quelle del nome.
+ho provato ad immaginarne uno più 'sofisticato', valido per qualunque nome.
+ */
 
-	public static boolean scan(String name, String prototype) {
+public class GenericName {
+
+	public static boolean scan(String name, String test) {
 		int state = 0;
 		int i = 0;
-		if (name.length() != prototype.length())
+		if (name.length() != test.length())
 			state = -1;
 		while (state >= 0 && i < name.length()) {
 			final char ch = name.charAt(i);
-			final char pr = prototype.charAt(i);
+			final char th = test.charAt(i);
 			switch (state) {
 			case 0:
-				if (ch == pr)
+				if (ch == th)
 					state = 0;
-				else if (ch != pr)
+				else if (ch != th)
 					state = 1;
 				else
 					state = -1;
 				break;
 			case 1:
-				if (ch == pr)
+				if (ch == th)
 					state = 1;
 				else
 					state = -1;

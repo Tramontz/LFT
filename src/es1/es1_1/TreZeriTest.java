@@ -12,21 +12,29 @@ import org.junit.Test;
  */
 public class TreZeriTest extends TestCase{
 
-    TreZeri treZeri;
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        treZeri = new TreZeri();
     }
 
     @Test
-    public void testScanNoThreeZero() throws Exception {
-        assertFalse(treZeri.scan("0011110"));
-        assertFalse(treZeri.scan("010101"));
-        assertFalse(treZeri.scan("10214"));
+    public void testScanThreeZero() throws Exception {
+    	assertTrue(TreZeri.scan("000111"));
+    	assertTrue(TreZeri.scan("0000111"));
+    	assertTrue(TreZeri.scan("10101001111001000111"));
+        assertFalse(TreZeri.scan("0011110"));
+        assertFalse(TreZeri.scan("010101"));
+        assertFalse(TreZeri.scan("10214"));
     }
     @Test
-    public void testScanThreeZero() throws Exception {
-        assertTrue(treZeri.scan("000111"));
+    public void testScanThreeZeroMod() throws Exception {
+    	assertFalse(TreZeriMod.scan("000111"));
+    	assertFalse(TreZeriMod.scan("0000111"));
+    	assertFalse(TreZeriMod.scan("10101001111001000111"));
+    	assertFalse(TreZeriMod.scan("10214"));
+    	assertTrue(TreZeriMod.scan("0011110"));
+    	assertTrue(TreZeriMod.scan("010101")); 
+    	assertTrue(TreZeriMod.scan("10101001111001001101"));
     }
 }

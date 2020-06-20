@@ -5,19 +5,23 @@ import org.junit.Test;
 
 public class BinaryMultipleTest extends TestCase{
 
-	BinaryMultiple binaryMultiple;
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        binaryMultiple = new BinaryMultiple();
     }
     @Test
     public void testScanBinaryMultiple() throws Exception {
-        assertTrue(binaryMultiple.scan("110"));
-        assertTrue(binaryMultiple.scan("1001"));
-        assertTrue(binaryMultiple.scan("0110"));
-        assertFalse(binaryMultiple.scan("0001111"));
-        assertFalse(binaryMultiple.scan("10"));
-        assertFalse(binaryMultiple.scan("111"));
+    	assertTrue(BinaryMultiple.scan("0"));
+        assertTrue(BinaryMultiple.scan("110"));
+        assertTrue(BinaryMultiple.scan("1001"));
+        assertTrue(BinaryMultiple.scan("0110"));
+        assertTrue(BinaryMultiple.scan("11"));
+        assertTrue(BinaryMultiple.scan("0001111"));
+        assertTrue(BinaryMultiple.scan("11011011000")); //(1752)
+        assertTrue(BinaryMultiple.scan("0000000000000000000000000000000000000000000110"));
+        assertFalse(BinaryMultiple.scan("10"));
+        assertFalse(BinaryMultiple.scan("111"));
+        assertFalse(BinaryMultiple.scan("00000000000000101100"));
+        assertFalse(BinaryMultiple.scan("1000000110000"));//4144
     }
 }

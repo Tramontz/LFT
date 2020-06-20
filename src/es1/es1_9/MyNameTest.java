@@ -6,23 +6,23 @@ import org.junit.Test;
 
 public class MyNameTest extends TestCase{
 
-	MyName comments;
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        comments = new MyName();
     }
+
 	    @Test
-    public void testFabio() throws Exception {
-	    assertTrue(comments.scan("FABIO","ZABIO"));
-	    assertFalse(comments.scan("FABIO","WDKOR"));
-	    assertTrue(comments.scan("FABIO","F*BIO"));
-	    assertTrue(comments.scan("FABIO","FACIO"));
-	    assertTrue(comments.scan("FABIO","FABRO"));
-		assertTrue(comments.scan("FABIO","FABIS"));
-        assertFalse(comments.scan("FABIO","AMANDA"));
-        assertFalse(comments.scan("FABIO","FFFABIO"));
-        assertFalse(comments.scan("FABIO","FABIOLA"));
-        assertFalse(comments.scan("FABIO","FXBIS"));
+    public void testGenericName() throws Exception {
+	    assertTrue(GenericName.scan("FABIO","ZABIO"));
+	    assertTrue(GenericName.scan("FABIO","F*BIO"));
+	    assertTrue(GenericName.scan("FABIO","FACIO"));
+	    assertTrue(GenericName.scan("FABIO","FABRO"));
+		assertTrue(GenericName.scan("FABIO","FABIS"));
+        assertFalse(GenericName.scan("FABIO","AMANDA"));
+        assertFalse(GenericName.scan("FABIO","FFFABIO"));
+        assertFalse(GenericName.scan("FABIO","FABIOLA"));
+        assertFalse(GenericName.scan("FABIO","FXBIS"));
+	    assertFalse(GenericName.scan("FABIO","WDKOR"));
+
     }
 }

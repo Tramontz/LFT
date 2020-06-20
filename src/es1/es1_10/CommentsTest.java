@@ -1,28 +1,27 @@
 package es1.es1_10;
-
+//Esempi di stringhe accettate: “/****/”, “/*a*a*/”, “/*a/**/”, “/**a///a/a**/”, “/**/”, “/*/*/”
+//Esempi di stringhe non accettate: “/*/”, “/**/***/”
 
 import junit.framework.TestCase;
 import org.junit.Test;
 
 public class CommentsTest extends TestCase{
 
-	Comments comments;
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        comments = new Comments();
     }
 	    @Test
     public void testComments() throws Exception {
-	    	assertTrue(comments.scan("/****/"));
-	    	assertTrue(comments.scan("/*a*a*/"));
-	    	assertTrue(comments.scan("/*a/**/"));
-	    	assertTrue(comments.scan("/**a///a/a**/"));
-	    	assertTrue(comments.scan("/**/"));
-	    	assertTrue(comments.scan("/*/*/"));
-	    	assertFalse(comments.scan("/*/"));
-	    	assertFalse(comments.scan("/**/***/"));
-	    	assertFalse(comments.scan("*/"));
-	    	assertFalse(comments.scan("bbabbbbabbbabbb"));
+	    	assertTrue(Comments.scan("/****/"));
+	    	assertTrue(Comments.scan("/*a*a*/"));
+	    	assertTrue(Comments.scan("/*a/**/"));
+	    	assertTrue(Comments.scan("/**a///a/a**/"));
+	    	assertTrue(Comments.scan("/**/"));
+	    	assertTrue(Comments.scan("/*/*/"));
+	    	assertFalse(Comments.scan("/*/"));
+	    	assertFalse(Comments.scan("/**/***/"));
+	    	assertFalse(Comments.scan("*/"));
+	    	assertFalse(Comments.scan("bbabbbbabbbabbb"));
     }
 }

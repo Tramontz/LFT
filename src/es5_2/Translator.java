@@ -1,62 +1,86 @@
 package es5_2;
 
-/*
- *CALCOLO FIRST/FOLLOW/INSIEME GUIDA
-1 	PROG→STAT eof
-2	STATLIST→STAT STATLIST_P
-3	STATLIST_P→STAT STATLIST_P
-4	STATLIST_P→ε
-5	STAT→( STAT_P )
-6	STAT_P→ id EXPR
-7	STAT_P→ cond BEXPR STAT ELSEOPT
-8	STAT_P→ while BEXPR STAT
-9	STAT_P→ do STATLIST
-10	STAT_P→ print EXPRLIST
-11	STAT_P→ read id
-12	ELSEOPT→ ( else STAT )
-13	ELSEOPT→ε
-14	BEXPR→ ( BEXPR_P )
-15	BEXPR_P→ RELOP EXPR EXPR
-16	EXPR→ num 
-17	EXPR→id
-18	EXPR→( EXPR_P )
-19	EXPR_P → + EXPR_LIST
-20	EXPR_P →- EXPR EXPR
-21	EXPR_P → * EXPR_LIST
-22	EXPR_P → / EXPR EXPR
-23	EXPR_LIST→ EXPR EXPR_LIST_P
-24	EXPR_LIST_P→EXPR EXPR_LIST_P
-25	EXPR_LIST_P→ε
+/*Modificare la grammatica del linguaggio P per permettere l'utilizzo dei connettivi logici
+&& (congiunzione), || (disgiunzione) e ! (negazione) in notazione prefissa nelle
+espressioni booleane, utilizzando le parentesi tonde per delimitare ogni sottoespressione.
+� Segue un esempio di un input che corrisponde alla grammatica con connettivi logici:
+(do
+(read x)
+(cond (|| (< x 10) (&& (> x 20) (!(> x 30))))
+ (print (+ x 100))
+)
+)
+� Si scriva uno SDT e si estenda il traduttore con un'implementazione corrispondente.
+� Suggerimento: Cercare di utilizzare la valutazione cortocircuitata per le espressioni
+booleane, come illustrato nelle lezioni di teoria
+*/
 
-*FIRST
+
+/*CALCOLO FIRST/FOLLOW/INSIEME GUIDA
+1 PROG->STAT eof
+2 STATLIST->STAT STATLIST_P
+3 STATLIST_P->STAT STATLIST_P
+4 STATLIST_P-> eps
+5 STAT->( STAT_P )
+6 STAT_P-> id EXPR
+7 STAT_P-> cond BEXPR STAT ELSEOPT
+8 STAT_P-> while BEXPR STAT
+9 STAT_P-> do STATLIST
+10 STAT_P-> print EXPRLIST
+11 STAT_P-> read id
+12 ELSEOPT-> ( else STAT )
+13 ELSEOPT-> eps
+14 BEXPR-> ( BEXPR_P )
+15 BEXPR-> ( BEXPR )
+16 BEXPR-> (&&( BEXPR ))
+17 BEXPR-> (||( BEXPR ))
+18 BEXPR-> (!( BEXPR ))
+19 BEXPR_P-> relop EXPR EXPR
+20 EXPR-> num 
+21 EXPR->id
+22 EXPR->( EXPR_P )
+23 EXPR_P -> + EXPRLIST
+24 EXPR_P -> - EXPR EXPR
+25 EXPR_P -> * EXPR_LIST
+26 EXPR_P -> / EXPR EXPR
+27 EXPR_LIST-> EXPR EXPR_LIST_P
+28 EXPR_LIST_P->EXPR EXPR_LIST_P
+29 EXPR_LIST_P->eps
+
+*FIRST SET
+*
 PROG	(
 STATLIST	(
-STATLIST_P	ε (
+STATLIST_P	 (
 STAT	(
 STAT_P	id cond while do print read
-ELSEOPT	( ε
-BEXPR	(
-BEXPR_P	RELOP
-EXPR	num id (
+ELSEOPT	(
+BEXPR	( && || !
+BEXPR_P	relop
+EXPR	num id(
 EXPR_P	+ - * /
-EXPR_LIST	numid (
-EXPR_LIST_P	numid ( ε
+EXPR_LIST	num id (
+EXPR_LIST_P	num id (
 *
-*FOLLOW
-PROG	┤
+*
+*FOLLOW SET
+*
+PROG	-|
 STATLIST	)
 STATLIST_P	)
-STAT	eof()
+STAT	EOF ( )
 STAT_P	)
 ELSEOPT	)
 BEXPR	()
-BEXPR_P	
-EXPR	)numid(
+BEXPR_P	)
+EXPR	) numid (
 EXPR_P	)
 EXPR_LIST	)
 EXPR_LIST_P	)
+
 *
 *GUIDA
+*
 1	(
 2	(
 3	(
@@ -71,19 +95,24 @@ EXPR_LIST_P	)
 12	(
 13	)
 14	(
-15	RELOP
-16	num
-17	id
-18	(
-19	+
-20	-
-21	*
-22	/
-23	num id (
-24	num id (
-25	)
+15	(
+16	&&
+17	||
+18	!
+19	relop
+20	num
+21	id
+22	(
+23	+
+24	-
+25	*
+26	/
+27	numid(
+28	numid(
+29	)
 *
 */
+
 
 import java.io.*;
 
@@ -299,6 +328,8 @@ public class Translator {
 	 * GUIDA '('
 	 * 
 	 * MODIFICA DELLA GRAMMATICA:
+	 * BEXPR-> ( BEXPR_P )
+	 * BEXPR-> ( BEXPR )
 	 * BEXPR-> (&&( BEXPR ))
 	 * BEXPR-> (||( BEXPR ))
 	 * BEXPR-> (!( BEXPR ))

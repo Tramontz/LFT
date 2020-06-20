@@ -8,12 +8,10 @@ import org.junit.Test;
  */
 
 public class IdentificatoriJavaTest extends TestCase {
-	IdentificatoriJava ij;
 
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		ij = new IdentificatoriJava();
 	}
 
 	@Test

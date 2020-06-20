@@ -1,62 +1,72 @@
 package es5;
 
-/*
- *CALCOLO FIRST/FOLLOW/INSIEME GUIDA
-1 	PROG→STAT eof
-2	STATLIST→STAT STATLIST_P
-3	STATLIST_P→STAT STATLIST_P
-4	STATLIST_P→ε
-5	STAT→( STAT_P )
-6	STAT_P→ id EXPR
-7	STAT_P→ cond BEXPR STAT ELSEOPT
-8	STAT_P→ while BEXPR STAT
-9	STAT_P→ do STATLIST
-10	STAT_P→ print EXPRLIST
-11	STAT_P→ read id
-12	ELSEOPT→ ( else STAT )
-13	ELSEOPT→ε
-14	BEXPR→ ( BEXPR_P )
-15	BEXPR_P→ RELOP EXPR EXPR
-16	EXPR→ num 
-17	EXPR→id
-18	EXPR→( EXPR_P )
-19	EXPR_P → + EXPR_LIST
-20	EXPR_P →- EXPR EXPR
-21	EXPR_P → * EXPR_LIST
-22	EXPR_P → / EXPR EXPR
-23	EXPR_LIST→ EXPR EXPR_LIST_P
-24	EXPR_LIST_P→EXPR EXPR_LIST_P
-25	EXPR_LIST_P→ε
+/* Esercizio 5.1. Si scriva un traduttore per programmi scritti nel linguaggio P (utilizzando uno dei
+lexer sviluppati per gli esercizi di Sezione 2). Si ricorda che la grammatica del linguaggio P e`
+definita nell’esercizio 3.2.
+Un frammento del codice di una possibile implementazione puo essere trovato in Listing 17 `
+(si noti che code e un oggetto della classe ` CodeGenerator).*/
 
-*FIRST
+
+/*CALCOLO FIRST/FOLLOW/INSIEME GUIDA
+1 	PROG->STAT eof
+2	STATLIST->STAT STATLIST_P
+3	STATLIST_P->STAT STATLIST_P
+4	STATLIST_P-> eps
+5	STAT->( STAT_P )
+6	STAT_P-> id EXPR
+7	STAT_P-> cond BEXPR STAT ELSEOPT
+8	STAT_P-> while BEXPR STAT
+9	STAT_P-> do STATLIST
+10	STAT_P-> print EXPRLIST
+11	STAT_P-> read id
+12	ELSEOPT-> ( else STAT )
+13	ELSEOPT->eps
+14	BEXPR-> ( BEXPR_P )
+15	BEXPR_P-> relop EXPR EXPR
+16	EXPR-> num 
+17	EXPR->id
+18	EXPR->( EXPR_P )
+19	EXPR_P -> + EXPRLIST
+20	EXPR_P ->- EXPR EXPR
+21	EXPR_P -> * EXPR_LIST
+22	EXPR_P -> / EXPR EXPR
+23	EXPR_LIST-> EXPR EXPR_LIST_P
+24	EXPR_LIST_P->EXPR EXPR_LIST_P
+25	EXPR_LIST_P->eps
+
+*FIRST SET
+*
 PROG	(
 STATLIST	(
-STATLIST_P	ε (
+STATLIST_P	eps(
 STAT	(
-STAT_P	id cond while do print read
-ELSEOPT	( ε
+STAT_P	idcondwhiledoprintread
+ELSEOPT	(eps
 BEXPR	(
 BEXPR_P	RELOP
-EXPR	num id (
+EXPR	numid(
 EXPR_P	+ - * /
-EXPR_LIST	numid (
-EXPR_LIST_P	numid ( ε
+EXPR_LIST	numid(
+EXPR_LIST_P	numid(eps
 *
-*FOLLOW
-PROG	┤
+*
+*FOLLOW SET
+PROG	-|
 STATLIST	)
 STATLIST_P	)
 STAT	eof()
 STAT_P	)
 ELSEOPT	)
-BEXPR	()
-BEXPR_P	
+BEXPR	(
+BEXPR_P	)
 EXPR	)numid(
 EXPR_P	)
 EXPR_LIST	)
 EXPR_LIST_P	)
+
 *
 *GUIDA
+*
 1	(
 2	(
 3	(
@@ -79,8 +89,8 @@ EXPR_LIST_P	)
 20	-
 21	*
 22	/
-23	num id (
-24	num id (
+23	numid(
+24	numid(
 25	)
 *
 */
@@ -318,7 +328,7 @@ public class Translator {
 	}
 
 	/*
-	 * BEXPR_P→ RELOP EXPR EXPR GUIDA relop
+	 * BEXPR_P-> RELOP EXPR EXPR GUIDA relop
 	 */
 
 	public void bexpr_p(int ltrue, int lfalse) {
@@ -366,7 +376,7 @@ public class Translator {
 	}
 
 	/*
-	 * EXPR→ num EXPR→id EXPR→( EXPR_P )
+	 * EXPR-> num EXPR->id EXPR->( EXPR_P )
 	 * 
 	 * GUIDA num id '('
 	 */
@@ -397,7 +407,7 @@ public class Translator {
 		}
 	}
 	/*
-	 * EXPR_P → + EXPR_LIST EXPR_P →- EXPR EXPR EXPR_P → * EXPR_LIST EXPR_P → / EXPR
+	 * EXPR_P -> + EXPR_LIST EXPR_P ->- EXPR EXPR EXPR_P -> * EXPR_LIST EXPR_P -> / EXPR
 	 * EXPR
 	 * 
 	 * GUIDA + - * /
@@ -452,7 +462,7 @@ public class Translator {
 	}
 
 	/*
-	 * EXPR_LIST→ EXPR EXPR_LIST_P
+	 * EXPR_LIST-> EXPR EXPR_LIST_P
 	 * 
 	 * GUIDA: num id (
 	 */
@@ -467,7 +477,7 @@ public class Translator {
 	}
 
 	/*
-	 * EXPR_LIST_P→EXPR EXPR_LIST_P EXPR_LIST_P→ε
+	 * EXPR_LIST_P->EXPR EXPR_LIST_P EXPR_LIST_P->eps
 	 * 
 	 * GUIDA num ID '(' GUIDA(eps): ')'
 	 */
@@ -491,8 +501,8 @@ public class Translator {
 		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestCondNoElse.pas";
 		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestWhile.pas";
 		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\esempio_semplice.pas";
-		String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\euclid.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\factorial.pas";
+		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\euclid.pas";
+		String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\factorial.pas";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Translator translator = new Translator(lex, br);
