@@ -1,9 +1,15 @@
-package es2;
+package es2_2;
+
+/**
+ Esercizio 2.2. Consideriamo la seguente nuova definizione di identificatori: un identificatore e`
+una sequenza non vuota di lettere, numeri, ed il simbolo di “underscore” _ ; la sequenza non
+comincia con un numero e non puo essere composta solo dal simbolo ` _. 
+Estendere il metodo lexical_scan per gestire identificatori che corrispondono alla nuova definizione
+*/
 
 import java.io.*;
-import java.util.*;
 
-public class Lexer2_3 {
+public class Lexer2_2 {
 	public static int line = 1;
 	private char peek = ' ';
 
@@ -20,33 +26,6 @@ public class Lexer2_3 {
 			if (peek == '\n')
 				line++;
 			readch(br);
-		}
-
-		while (peek == '/') {
-			readch(br);
-			if (peek == '*') {
-				readch(br);
-				while (peek != '/') {
-					while (peek != '*') {
-						readch(br);
-					}
-					readch(br);
-				}
-				readch(br);
-				while (peek == ' ' || peek == '\n' || peek == '\t' || peek == '\r') {
-					if (peek == '\n')
-						line++;
-					readch(br);
-				}
-			} else if (peek == '/') {
-				while (peek != '\n' && peek != (char) -1) {
-					readch(br);
-				}
-				readch(br);
-				line++;
-			} else {
-				return Token.div;
-			}
 		}
 		switch (peek) {
 		case '!':
@@ -73,6 +52,9 @@ public class Lexer2_3 {
 		case '*':
 			peek = ' ';
 			return Token.mult;
+		case '/':
+			peek = ' ';
+			return Token.div;
 		case ';':
 			peek = ' ';
 			return Token.semicolon;
@@ -125,10 +107,9 @@ public class Lexer2_3 {
 		case (char) -1:
 			return new Token(Tag.EOF);
 		default:
-			if (Character.isLetter(peek)) {
-				// ... gestire il caso degli identificatori e delle parole chiave //
+			if (Character.isLetter(peek)) { // Letters
 				String tok = "";
-				while (Character.isLetter(peek) || Character.isDigit(peek)) {
+				while (Character.isLetter(peek) || Character.isDigit(peek) || peek == '_') {
 					tok = tok + peek;
 					readch(br);
 				}
@@ -164,15 +145,31 @@ public class Lexer2_3 {
 					// peek = ' ';
 					return new Word(257, tok);
 				}
-			} else if (Character.isDigit(peek)) {
-				// ... gestire il caso dei numeri ... //
+			} else if (Character.isDigit(peek)) { // Numbers
 				String num = "";
 				while (Character.isDigit(peek)) {
 					num = num + peek;
 					readch(br);
 				}
 				return new NumberTok(Integer.parseInt(num));
-			} else {
+			} else if (peek == '_') { // Underscore
+				String un = "";
+				while (peek == '_' || Character.isDigit(peek) || Character.isLetter(peek)) {
+					un = un + peek;
+					readch(br);
+				}
+				int isunder = 0;
+				for (int i = 0; i < un.length(); i++) {
+					if (un.charAt(i) == '_') {
+						isunder++;
+					}
+				}
+				if (isunder == un.length()) {
+					System.err.println("Erroneous sequence of characters: ");
+					return null;
+				} else
+					return new Word(257, un);
+			} else { // ERROR
 				System.err.println("Erroneous character: " + peek);
 				return null;
 			}
@@ -181,8 +178,9 @@ public class Lexer2_3 {
 
 //--------------//
 	public static void main(String[] args) {
-		Lexer2_3 lex = new Lexer2_3();
-		String path = "E:\\Workspaces\\LFT_lab\\src\\es2\\Es2_3.txt"; // il percorso del file da leggere
+		Lexer2_2 lex = new Lexer2_2();
+		String path = "E:\\Workspaces\\LFT_lab\\src\\es2_2\\Es2_2.txt"; // il percorso del file da
+																							// leggere
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Token tok;

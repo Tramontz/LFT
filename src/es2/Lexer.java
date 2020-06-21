@@ -1,7 +1,14 @@
 package es2;
 
+/*
+Gli identificatori corrispondono all’espressione regolare [a - zA - Z][a - zA - Z0 - 9]
+e i numeri corrispondono all’espressione regolare 0|[1 - 9][0 - 9]
+
+L’analizzatore lessicale dovra ignorare tutti i caratteri riconosciuti come “spazi” (incluse le 
+tabulazioni e i ritorni a capo), ma dovra segnalare la presenza di caratteri illeciti, quali ad esempio # o @.
+*/
+
 import java.io.*;
-import java.util.*;
 
 public class Lexer {
 	public static int line = 1;

@@ -1,9 +1,18 @@
-package es2;
+package es2_3;
+
+/*
+. Estendere il metodo lexical_scan in modo tale che possa trattare la presenza di
+commenti nel file di input. I commenti possono essere scritti in due modi:
+• commenti delimitati con / * e * /
+• commenti che iniziano con // e che terminano con un a capo oppure con EOF.
+I commenti devono essere ignorati dal programma per l’analisi lessicale; in altre parole, per le
+parti dell’input che contengono commenti, non deve essere generato nessun token. Ad esempio,
+consideriamo l’input seguente.
+*/
 
 import java.io.*;
-import java.util.*;
 
-public class Lexer2_2 {
+public class Lexer2_3 {
 	public static int line = 1;
 	private char peek = ' ';
 
@@ -20,6 +29,32 @@ public class Lexer2_2 {
 			if (peek == '\n')
 				line++;
 			readch(br);
+		}
+		while (peek == '/') {
+			readch(br);
+			if (peek == '*') {
+				readch(br);
+				while (peek != '/') {
+					while (peek != '*') {
+						readch(br);
+					}
+					readch(br);
+				}
+				readch(br);
+				while (peek == ' ' || peek == '\n' || peek == '\t' || peek == '\r') {
+					if (peek == '\n')
+						line++;
+					readch(br);
+				}
+			} else if (peek == '/') {
+				while (peek != '\n' && peek != (char) -1) {
+					readch(br);
+				}
+				readch(br);
+				line++;
+			} else {
+				return Token.div;
+			}
 		}
 		switch (peek) {
 		case '!':
@@ -46,9 +81,6 @@ public class Lexer2_2 {
 		case '*':
 			peek = ' ';
 			return Token.mult;
-		case '/':
-			peek = ' ';
-			return Token.div;
 		case ';':
 			peek = ' ';
 			return Token.semicolon;
@@ -101,9 +133,10 @@ public class Lexer2_2 {
 		case (char) -1:
 			return new Token(Tag.EOF);
 		default:
-			if (Character.isLetter(peek)) { // Letters
+			if (Character.isLetter(peek)) {
+				// ... gestire il caso degli identificatori e delle parole chiave //
 				String tok = "";
-				while (Character.isLetter(peek) || Character.isDigit(peek) || peek == '_') {
+				while (Character.isLetter(peek) || Character.isDigit(peek)) {
 					tok = tok + peek;
 					readch(br);
 				}
@@ -139,31 +172,15 @@ public class Lexer2_2 {
 					// peek = ' ';
 					return new Word(257, tok);
 				}
-			} else if (Character.isDigit(peek)) { // Numbers
+			} else if (Character.isDigit(peek)) {
+				// ... gestire il caso dei numeri ... //
 				String num = "";
 				while (Character.isDigit(peek)) {
 					num = num + peek;
 					readch(br);
 				}
 				return new NumberTok(Integer.parseInt(num));
-			} else if (peek == '_') { // Underscore
-				String un = "";
-				while (peek == '_' || Character.isDigit(peek) || Character.isLetter(peek)) {
-					un = un + peek;
-					readch(br);
-				}
-				int isunder = 0;
-				for (int i = 0; i < un.length(); i++) {
-					if (un.charAt(i) == '_') {
-						isunder++;
-					}
-				}
-				if (isunder == un.length()) {
-					System.err.println("Erroneous sequence of characters: ");
-					return null;
-				} else
-					return new Word(257, un);
-			} else { // ERROR
+			} else {
 				System.err.println("Erroneous character: " + peek);
 				return null;
 			}
@@ -172,9 +189,8 @@ public class Lexer2_2 {
 
 //--------------//
 	public static void main(String[] args) {
-		Lexer2_2 lex = new Lexer2_2();
-		String path = "E:\\Workspaces\\LFT_lab\\src\\es2\\Es2_2.txt"; // il percorso del file da
-																							// leggere
+		Lexer2_3 lex = new Lexer2_3();
+		String path = "E:\\Workspaces\\LFT_lab\\src\\es2_3\\Es2_3.txt"; // il percorso del file da leggere
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Token tok;
