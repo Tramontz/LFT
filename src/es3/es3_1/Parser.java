@@ -1,5 +1,13 @@
 package es3.es3_1;
 
+
+/*
+Esercizio 3.1. Si scriva un analizzatore sintattico a discesa ricorsiva che parsifichi espressioni
+aritmetiche molto semplici, scritte in notazione infissa, e composte soltanto da numeri non negativi
+(ovvero sequenze di cifre decimali), operatori di somma e sottrazione + e -, operatori di
+moltiplicazione e divisione * e /, simboli di parentesi ( e ).
+*/
+
 import java.io.*;
 
 public class Parser {
@@ -19,7 +27,7 @@ public class Parser {
 	}
 
 	void error(String s) {
-		throw new Error("near line " + lex.line + ": " + s);
+		throw new Error("near line " + Lexer.line + ": " + s);
 	}
 
 	void match(int tag) {

@@ -1,5 +1,10 @@
 package es4;
 
+/*
+Esercizio 4.1 (Valutatore di espressioni semplici). Modificare l’analizzatore sintattico dell’esercizio
+3.1 in modo da valutare le espressioni aritmetiche semplici
+*/
+
 import java.io.*;
 
 public class Valutatore {
@@ -19,7 +24,7 @@ public class Valutatore {
 	}
 
 	void error(String s) {
-		throw new Error("near line " + lex.line + ": " + s);
+		throw new Error("near line " + Lexer.line + ": " + s);
 	}
 
 	void match(int t) {
@@ -52,6 +57,7 @@ public class Valutatore {
 		int term_val, exprp_val = exprp_i;
 		switch (look.tag) {
 		case '+':
+			System.out.println("entro in +");
 			move();
 			term_val = term();
 			exprp_val = exprp(exprp_i + term_val);
@@ -60,6 +66,7 @@ public class Valutatore {
 			move();
 			term_val = term();
 			exprp_val = exprp(exprp_i - term_val);
+			break;
 		case ')':
 		case Tag.EOF:
 			exprp_val = exprp_i;
@@ -88,6 +95,7 @@ public class Valutatore {
 			move();
 			fact_val = fact();
 			termp_val = termp(termp_i / fact_val);
+			break;
 		case ')':
 		case '+':
 		case '-':
@@ -101,27 +109,26 @@ public class Valutatore {
 	}
 
 	private int fact() {
-		int expr_val, fact_val, val = 0;
+		int fact_val = 0;
 		switch (look.tag) {
 		case '(':
 			move();
-			val = expr_val = expr();
+			fact_val = expr();
 			match(')');
 			break;
 		case Tag.NUM:
-			val = fact_val = ((NumberTok) look).lexeme;
+			fact_val = ((NumberTok) look).lexeme;
 			move();
 			break;
 		default:
 			error("Error in fact");
 		}
-		return val;
+		return fact_val;
 	}
 
 	public static void main(String[] args) {
 		Lexer lex = new Lexer();
-		String path = "\\Workspaces\\LFT_lab\\src\\es4\\Es4.txt"; // il percorso del file da
-																							// leggere
+		String path = "\\Workspaces\\LFT_lab\\src\\es4\\Es4.txt"; // il percorso del file da leggere
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Valutatore valutatore = new Valutatore(lex, br);

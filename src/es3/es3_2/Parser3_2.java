@@ -1,4 +1,16 @@
 package es3.es3_2;
+/*
+ Esercizio 3.2. Segue una grammatica per un semplice linguaggio di programmazione, dove i terminali
+della grammatica corrispondono ai token descritti in Sezione 2 (in Tabella 1). Si noti che
+RELOP corrisponde a un elemento dell’insieme {==, <>, <=, >=, <, >} e ID corrisponde a un identificatore.
+Si noti inoltre che la sintassi del linguaggio ´e ispirata al linguaggio di programmazione
+funzionale Scheme. In particolare, le espressioni aritmetiche sono scritte in notazione prefissa o polacca,
+diversamente da quanto accadeva nell’esercizio precedente dove venivano scritte secondo
+la notazione infissa (standard). Analogamente le espressioni booleane sono scritte in notazione
+prefissa, seguendo la convenzione di porre l’operatore relazionale a sinistra delle espressioni.
+Si noti infine che anche per lo statement di assegnamento viene proposta una sintassi prefissa.
+Scrivere un analizzatore sintattico a discesa ricorsiva per la grammatica.
+ */
 
 import java.io.*;
 
@@ -19,7 +31,7 @@ public class Parser3_2 {
 	}
 
 	void error(String s) {
-		throw new Error("near line " + lex.line + ": " + s);
+		throw new Error("near line " + Lexer.line + ": " + s); // oppure lex.line
 	}
 
 	void match(int t) {
@@ -44,7 +56,16 @@ public class Parser3_2 {
 		if (look.tag != ')') {
 			stat();
 			statlistp();
-		}
+		}// else eps
+	}
+	
+	private void stat() {
+		if (look.tag == '(') {
+			move();
+			statp();
+			match(')');
+		} else
+			error("Error in stat");
 	}
 
 	private void statp() {
@@ -80,14 +101,7 @@ public class Parser3_2 {
 		}
 	}
 
-	private void stat() {
-		if (look.tag == '(') {
-			move();
-			statp();
-			match(')');
-		} else
-			error("Error in stat");
-	}
+	
 
 	private void elseopt() {
 		if (look.tag == '(') {
@@ -178,8 +192,7 @@ public class Parser3_2 {
 
 	public static void main(String[] args) {
 		Lexer lex = new Lexer();
-		String path = "E:\\Workspaces\\LFT_lab\\src\\es3\\es3_2\\Es3_2.txt"; // il percorso del file da
-																							// leggere
+		String path = "E:\\Workspaces\\LFT_lab\\src\\es3\\es3_2\\Es3_2.txt"; // il percorso del file da leggere
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Parser3_2 parser = new Parser3_2(lex, br);

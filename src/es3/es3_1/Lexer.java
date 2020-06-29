@@ -1,7 +1,6 @@
 package es3.es3_1;
 
 import java.io.*;
-import java.util.*;
 
 public class Lexer {
 	public static int line = 1;
