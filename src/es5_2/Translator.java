@@ -470,21 +470,11 @@ public class Translator {
 			break;
 		}
 	}
-	/*
-	 * EXPR_P → + EXPR_LIST EXPR_P →- EXPR EXPR EXPR_P → * EXPR_LIST EXPR_P
-	 * → / EXPR EXPR
-	 * 
-	 * GUIDA + - * /
-	 */
 
 	private void expr_p() {
 		switch (look.tag) {
 		case '+':
 			match('+');
-			/*
-			 * if(look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID){
-			 * error("Erroneous character after '+', found " + look); }
-			 */
 			expr();
 			exprlist();
 			code.emit(OpCode.iadd);
@@ -493,28 +483,18 @@ public class Translator {
 
 		case '-':
 			match('-');
-			/*
-			 * if(look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID){
-			 * error("Erroneous character after '-', found " + look); }
-			 */
 			expr();
 			expr();
 			code.emit(OpCode.isub);
 			break;
 		case '*':
 			match('*');
-			if (look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID) {
-				error("Erroneous character after '*', found " + look);
-			}
 			exprlist();
 			code.emit(OpCode.imul);
 			break;
 
 		case '/':
 			match('/');
-			if (look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID) {
-				error("Erroneous character after '/', found " + look);
-			}
 			expr();
 			expr();
 			code.emit(OpCode.idiv);
@@ -564,7 +544,7 @@ public class Translator {
 		// String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestCond.pas";
 		// String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestCondNoElse.pas";
 		// String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestWhile.pas";
-		// "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\esempio_semplice.pas";
+		// String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\esempio_semplice.pas";
 		// String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\euclid.pas";
 		// String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\factorial.pas";
 

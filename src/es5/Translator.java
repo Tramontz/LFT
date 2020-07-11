@@ -40,14 +40,14 @@ PROG	(
 STATLIST	(
 STATLIST_P	eps(
 STAT	(
-STAT_P	idcondwhiledoprintread
-ELSEOPT	(eps
+STAT_P	id cond while do print read
+ELSEOPT	( eps
 BEXPR	(
 BEXPR_P	RELOP
-EXPR	numid(
+EXPR	numid (
 EXPR_P	+ - * /
-EXPR_LIST	numid(
-EXPR_LIST_P	numid(eps
+EXPR_LIST	numid (
+EXPR_LIST_P	numid ( eps
 *
 *
 *FOLLOW SET
@@ -166,11 +166,11 @@ public class Translator {
 	}
 
 	/*
-	 * il metodo stat_p() si occupa di guardare le istruzioni chiave della
-	 * grammatica in oggetto GUIDA:id cond while do print read ID:=<expr>* COND
+	 * il metodo stat_p() si occupa di parsificare le istruzioni chiave della
+	 * grammatica in oggetto 
+	 * GUIDA:id cond while do print read ID:=<expr>* COND
 	 * <bexpr>, <stat> <elseopt> WHILE <bexpr> <stat> DO(<statlist>) print
 	 * <ExprList> read ID
-	 * 
 	 */
 
 	public void stat_p(int lnext) {
@@ -180,8 +180,7 @@ public class Translator {
 			match('=');
 			if (look.tag == Tag.ID) {
 				int next_id = code.newLabel();
-				int id_addr = st.lookupAddress(((Word) look).lexeme); // controlla se l'ID è già assegnato a un
-																		// indirizzo
+				int id_addr = st.lookupAddress(((Word) look).lexeme); // controlla se l'ID è già assegnato a un indirizzo
 				if (id_addr == -1) {
 					id_addr = count; // count = 0
 					st.insert(((Word) look).lexeme, count++); // inserisce in un nuovo indirizzo l'ID
@@ -196,11 +195,9 @@ public class Translator {
 			break;
 
 		case Tag.PRINT:
-			//int next_print = code.newLabel();wefwefwefwefwefwef
 			match(Tag.PRINT);
 			exprlist();
 			code.emit(OpCode.invokestatic, 1); // 1 == invoca la funzione print
-			//code.emitLabel(lnext);wefwefwefwefwefwfwefw
 			break;
 
 		case Tag.READ:
@@ -221,7 +218,9 @@ public class Translator {
 			}
 			break;
 			
-/*init_case: lable di partenza per il valutatore, che ci sia 'else' oppure no, dopo la valutazione il programma andrà a next_case*/
+/*
+ * init_case: lable di partenza per il valutatore, che ci sia 'else' oppure no, dopo la valutazione il programma andrà a next_case
+ */
 		case Tag.COND:
 			int init_case = code.newLabel();
 			int next_case = code.newLabel();
@@ -238,7 +237,7 @@ public class Translator {
 		case Tag.WHILE:
 
 			match(Tag.WHILE);
-			int lnext_stat_while = code.newLabel(); // begin = newlabel() || b.true
+			int lnext_stat_while = code.newLabel(); // begin = newlabel() || B.true
 			int end_while = code.newLabel(); // B.false
 			code.emitLabel(lnext_stat_while);
 			bexpr(end_while);
@@ -407,11 +406,13 @@ public class Translator {
 		}
 	}
 	/*
-	 * EXPR_P -> + EXPR_LIST EXPR_P ->- EXPR EXPR EXPR_P -> * EXPR_LIST EXPR_P -> / EXPR
-	 * EXPR
-	 * 
-	 * GUIDA + - * /
-	 */
+	EXPR_P -> + EXPRLIST
+	EXPR_P -> - EXPR EXPR
+	EXPR_P -> * EXPR_LIST
+	EXPR_P -> / EXPR EXPR
+
+	* GUIDA + - * /
+	*/
 
 	private void expr_p() {
 		switch (look.tag) {
@@ -439,18 +440,18 @@ public class Translator {
 			break;
 		case '*':
 			match('*');
-			if (look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID) {
+			/*if (look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID) {
 				error("Erroneous character after '*', found " + look);
-			}
+			}*/
 			exprlist();
 			code.emit(OpCode.imul);
 			break;
 
 		case '/':
 			match('/');
-			if (look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID) {
+			/*if (look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID) {
 				error("Erroneous character after '/', found " + look);
-			}
+			}*/
 			expr();
 			expr();
 			code.emit(OpCode.idiv);

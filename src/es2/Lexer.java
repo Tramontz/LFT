@@ -60,7 +60,7 @@ public class Lexer {
 			peek = ' ';
 			return Token.semicolon;
 		// ---------//
-		case '&':
+		case '&':					//riconosco & come carattere valido solo se rappresenta l'operazione AND (&&)
 			readch(br);
 			if (peek == '&') {
 				peek = ' ';
@@ -69,7 +69,7 @@ public class Lexer {
 				System.err.println("Erroneous character" + " after & : " + peek);
 				return null;
 			}
-		case '|':
+		case '|':					//riconosco || come carattere valido solo se rappresenta l'operazione OR (||)
 			readch(br);
 			if (peek == '|') {
 				peek = ' ';
@@ -111,7 +111,7 @@ public class Lexer {
 			if (Character.isLetter(peek)) {
 				// ... gestire il caso degli identificatori e delle parole chiave //
 				String tok = "";
-				while (Character.isLetter(peek) || Character.isDigit(peek)) {
+				while (Character.isLetter(peek) || Character.isDigit(peek)) { //riconosco tutta la sequenza dell'identificatore (char || char+digit)
 					tok = tok + peek;
 					readch(br);
 				}
@@ -145,7 +145,7 @@ public class Lexer {
 					return Word.read;
 				default:
 					// peek = ' ';
-					return new Word(257, tok);
+					return new Word(257, tok);	//se non viene riconosciuto come un token noto, lo ritengo un identificatore
 				}
 			} else if (Character.isDigit(peek)) {
 				// ... gestire il caso dei numeri ... //

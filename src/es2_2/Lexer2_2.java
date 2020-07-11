@@ -58,7 +58,6 @@ public class Lexer2_2 {
 		case ';':
 			peek = ' ';
 			return Token.semicolon;
-		// ---------//
 		case '&':
 			readch(br);
 			if (peek == '&') {
@@ -107,7 +106,7 @@ public class Lexer2_2 {
 		case (char) -1:
 			return new Token(Tag.EOF);
 		default:
-			if (Character.isLetter(peek)) { // Letters
+			if (Character.isLetter(peek)) { // Lettere
 				String tok = "";
 				while (Character.isLetter(peek) || Character.isDigit(peek) || peek == '_') {
 					tok = tok + peek;
@@ -115,60 +114,50 @@ public class Lexer2_2 {
 				}
 				switch (tok) {
 				case "cond":
-					// peek = ' ';
 					return Word.cond;
 				case "when":
-					// peek = ' ';
 					return Word.when;
 				case "then":
-					// peek = ' ';
 					return Word.then;
 				case "else":
-					// peek = ' ';
 					return Word.elsetok;
 				case "while":
-					// peek = ' ';
 					return Word.whiletok;
 				case "do":
-					// peek = ' ';
 					return Word.dotok;
 				case "seq":
-					// peek = ' ';
 					return Word.seq;
 				case "print":
-					// peek = ' ';
 					return Word.print;
 				case "read":
-					// peek = ' ';
 					return Word.read;
 				default:
-					// peek = ' ';
 					return new Word(257, tok);
 				}
-			} else if (Character.isDigit(peek)) { // Numbers
+			} else if (Character.isDigit(peek)) { // Numeri
 				String num = "";
 				while (Character.isDigit(peek)) {
 					num = num + peek;
 					readch(br);
 				}
 				return new NumberTok(Integer.parseInt(num));
-			} else if (peek == '_') { // Underscore
-				String un = "";
+			} else if (peek == '_') { 							// Underscore
+				String underscore = "";
 				while (peek == '_' || Character.isDigit(peek) || Character.isLetter(peek)) {
-					un = un + peek;
+					underscore = underscore + peek;
 					readch(br);
 				}
 				int isunder = 0;
-				for (int i = 0; i < un.length(); i++) {
-					if (un.charAt(i) == '_') {
+				for (int i = 0; i < underscore.length(); i++) {
+					if (underscore.charAt(i) == '_') {
 						isunder++;
 					}
 				}
-				if (isunder == un.length()) {
+				if (isunder == underscore.length()) {
 					System.err.println("Erroneous sequence of characters: ");
 					return null;
 				} else
-					return new Word(257, un);
+					return new Word(257, underscore);
 			} else { // ERROR
 				System.err.println("Erroneous character: " + peek);
 				return null;
@@ -176,11 +165,9 @@ public class Lexer2_2 {
 		}
 	}
 
-//--------------//
 	public static void main(String[] args) {
 		Lexer2_2 lex = new Lexer2_2();
-		String path = "E:\\Workspaces\\LFT_lab\\src\\es2_2\\Es2_2.txt"; // il percorso del file da
-																							// leggere
+		String path = "E:\\Workspaces\\LFT_lab\\src\\es2_2\\Es2_2.txt"; // il percorso del file da leggere
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Token tok;

@@ -185,8 +185,7 @@ public class Translator {
 			match('=');
 			if (look.tag == Tag.ID) {
 				int next_id = code.newLabel();
-				int id_addr = st.lookupAddress(((Word) look).lexeme); // controlla se l'ID Ã¨ giÃ  assegnato a un
-																		// indirizzo
+				int id_addr = st.lookupAddress(((Word) look).lexeme); // controlla se l'ID è già  assegnato a un indirizzo
 				if (id_addr == -1) {
 					id_addr = count; // count = 0
 					st.insert(((Word) look).lexeme, count++); // inserisce in un nuovo indirizzo l'ID
@@ -201,18 +200,16 @@ public class Translator {
 			break;
 
 		case Tag.PRINT:
-			//int next_print = code.newLabel();wefwefwefwefwefwef
 			match(Tag.PRINT);
 			exprlist();
 			code.emit(OpCode.invokestatic, 1); // 1 == invoca la funzione print
-			//code.emitLabel(lnext);wefwefwefwefwefwfwefw
 			break;
 
 		case Tag.READ:
 			int next_read = code.newLabel();
 			match(Tag.READ);
 			if (look.tag == Tag.ID) {
-				int read_id_addr = st.lookupAddress(((Word) look).lexeme); // controlla se l'ID Ã¨ giÃ  assegnato a un indirizzo
+				int read_id_addr = st.lookupAddress(((Word) look).lexeme); // controlla se l'ID è già  assegnato a un indirizzo
 				if (read_id_addr == -1) {
 					read_id_addr = count;
 					st.insert(((Word) look).lexeme, count++);
@@ -376,11 +373,7 @@ public class Translator {
 		}
 	}
 
-	/*
-	 * EXPRâ†’ num EXPRâ†’id EXPRâ†’( EXPR_P )
-	 * 
-	 * GUIDA num id '('
-	 */
+
 	private void expr() {
 		switch (look.tag) {
 		case Tag.NUM:
@@ -418,40 +411,25 @@ public class Translator {
 		switch (look.tag) {
 		case '+':
 			match('+');
-			/*
-			 * if(look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID){
-			 * error("Erroneous character after '+', found " + look); }
-			 */
 			expr();
 			exprlist();
 			code.emit(OpCode.iadd);
-
 			break;
 
 		case '-':
-			match('-');
-			/*
-			 * if(look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID){
-			 * error("Erroneous character after '-', found " + look); }
-			 */
+			match('-');			
 			expr();
 			expr();
 			code.emit(OpCode.isub);
 			break;
 		case '*':
-			match('*');
-			if (look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID) {
-				error("Erroneous character after '*', found " + look);
-			}
+			match('*');			
 			exprlist();
 			code.emit(OpCode.imul);
 			break;
 
 		case '/':
 			match('/');
-			if (look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID) {
-				error("Erroneous character after '/', found " + look);
-			}
 			expr();
 			expr();
 			code.emit(OpCode.idiv);
@@ -469,7 +447,6 @@ public class Translator {
 	 */
 	private void exprlist() {
 		if (look.tag == '(' || look.tag == Tag.NUM || look.tag == Tag.ID) {
-			// match(look.tag);
 			expr();
 			exprlist_p();
 		} else {

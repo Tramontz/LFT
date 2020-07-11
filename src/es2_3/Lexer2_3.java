@@ -24,7 +24,7 @@ public class Lexer2_3 {
 		}
 	}
 
-	public Token lexical_scan(BufferedReader br) {
+	public Token lexical_scan(BufferedReader br){
 		while (peek == ' ' || peek == '\t' || peek == '\n' || peek == '\r') {
 			if (peek == '\n')
 				line++;
@@ -84,7 +84,6 @@ public class Lexer2_3 {
 		case ';':
 			peek = ' ';
 			return Token.semicolon;
-		// ---------//
 		case '&':
 			readch(br);
 			if (peek == '&') {
@@ -134,7 +133,6 @@ public class Lexer2_3 {
 			return new Token(Tag.EOF);
 		default:
 			if (Character.isLetter(peek)) {
-				// ... gestire il caso degli identificatori e delle parole chiave //
 				String tok = "";
 				while (Character.isLetter(peek) || Character.isDigit(peek)) {
 					tok = tok + peek;
@@ -142,38 +140,27 @@ public class Lexer2_3 {
 				}
 				switch (tok) {
 				case "cond":
-					// peek = ' ';
 					return Word.cond;
 				case "when":
-					// peek = ' ';
 					return Word.when;
 				case "then":
-					// peek = ' ';
 					return Word.then;
 				case "else":
-					// peek = ' ';
 					return Word.elsetok;
 				case "while":
-					// peek = ' ';
 					return Word.whiletok;
 				case "do":
-					// peek = ' ';
 					return Word.dotok;
 				case "seq":
-					// peek = ' ';
 					return Word.seq;
 				case "print":
-					// peek = ' ';
 					return Word.print;
 				case "read":
-					// peek = ' ';
 					return Word.read;
 				default:
-					// peek = ' ';
 					return new Word(257, tok);
 				}
 			} else if (Character.isDigit(peek)) {
-				// ... gestire il caso dei numeri ... //
 				String num = "";
 				while (Character.isDigit(peek)) {
 					num = num + peek;
@@ -187,7 +174,6 @@ public class Lexer2_3 {
 		}
 	}
 
-//--------------//
 	public static void main(String[] args) {
 		Lexer2_3 lex = new Lexer2_3();
 		String path = "E:\\Workspaces\\LFT_lab\\src\\es2_3\\Es2_3.txt"; // il percorso del file da leggere
