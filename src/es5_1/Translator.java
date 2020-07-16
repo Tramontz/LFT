@@ -473,14 +473,15 @@ public class Translator {
 
 	public static void main(String[] args) {
 		Lexer lex = new Lexer();
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\A.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\B.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestCond.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestCondNoElse.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestWhile.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\esempio_semplice.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\euclid.pas";
-		String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\factorial.pas";
+		String absolutePath="E:\\Workspaces\\LFT_lab\\";
+		//String path = absolutePath+"src\\es5\\test\\A.lft";
+		//String path = absolutePath+"src\\es5\\test\\B.lft";
+		//String path = absolutePath+"src\\es5\\test\\TestCond.lft";
+		//String path = absolutePath+"src\\es5\\test\\TestCondNoElse.lft";
+		//String path = absolutePath+"src\\es5\\test\\TestWhile.lft";
+		//String path = absolutePath+"src\\es5\\test\\esempio_semplice.lft";
+		//String path = absolutePath+"src\\es5\\test\\euclid.lft";
+		String path = absolutePath+"src\\es5\\test\\factorial.lft";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Translator translator = new Translator(lex, br);

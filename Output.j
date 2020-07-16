@@ -33,34 +33,20 @@
  invokestatic Output/read()I
  istore 0
 L1:
+L2:
  iload 0
- ldc 10
- if_icmplt L6
- goto L5
-L6:
- goto L4
-L5:
- iload 0
- ldc 20
- if_icmpgt L8
- goto L2
-L8:
- iload 0
- ldc 30
- if_icmpgt L10
- goto L9
-L10:
- goto L2
-L9:
- goto L4
+ ldc 0
+ if_icmpgt L4
+ goto L3
 L4:
  iload 0
- ldc 100
- iadd 
+ ldc 1
+ isub 
+ istore 0
+L5:
+ iload 0
  invokestatic Output/print(I)V
- goto L3
-L2:
- goto L3
+ goto L2
 L3:
 L0:
  return

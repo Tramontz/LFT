@@ -259,7 +259,6 @@ public class Translator {
 	 */
 	public void statlist_p(int lnext) {
 		if (look.tag == '(') {
-			// match(look.tag);
 			stat(lnext);
 			statlist_p(lnext);
 		} else if (look.tag == ')') {
@@ -418,10 +417,6 @@ public class Translator {
 		switch (look.tag) {
 		case '+':
 			match('+');
-			/*
-			 * if(look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID){
-			 * error("Erroneous character after '+', found " + look); }
-			 */
 			expr();
 			exprlist();
 			code.emit(OpCode.iadd);
@@ -430,28 +425,18 @@ public class Translator {
 
 		case '-':
 			match('-');
-			/*
-			 * if(look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID){
-			 * error("Erroneous character after '-', found " + look); }
-			 */
 			expr();
 			expr();
 			code.emit(OpCode.isub);
 			break;
 		case '*':
 			match('*');
-			/*if (look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID) {
-				error("Erroneous character after '*', found " + look);
-			}*/
 			exprlist();
 			code.emit(OpCode.imul);
 			break;
 
 		case '/':
 			match('/');
-			/*if (look.tag != Tag.NUM && look.tag != '(' && look.tag != Tag.ID) {
-				error("Erroneous character after '/', found " + look);
-			}*/
 			expr();
 			expr();
 			code.emit(OpCode.idiv);
@@ -496,14 +481,15 @@ public class Translator {
 
 	public static void main(String[] args) {
 		Lexer lex = new Lexer();
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\A.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\B.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestCond.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestCondNoElse.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\TestWhile.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\esempio_semplice.pas";
-		//String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\euclid.pas";
-		String path = "E:\\Workspaces\\LFT_lab\\src\\es5\\test\\factorial.pas";
+		String absolutePath="E:\\Workspaces\\LFT_lab\\";
+		//String path = absolutePath+"src\\es5\\test\\A.lft";
+		//String path = absolutePath+"src\\es5\\test\\B.lft";
+		//String path = absolutePath+"src\\es5\\test\\TestCond.lft";
+		//String path = absolutePath+"src\\es5\\test\\TestCondNoElse.lft";
+		//String path = absolutePath+"src\\es5\\test\\TestWhile.lft";
+		//String path = absolutePath+"src\\es5\\test\\esempio_semplice.lft";
+		//String path = absolutePath+"src\\es5\\test\\euclid.lft";
+		String path = absolutePath+"src\\es5\\test\\factorial.lft";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Translator translator = new Translator(lex, br);
