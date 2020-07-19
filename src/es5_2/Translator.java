@@ -538,7 +538,8 @@ public class Translator {
 		//String path = absolutePath+"src\\es5\\test\\TestWhile.lft";
 		//String path = absolutePath+"src\\es5\\test\\esempio_semplice.lft";
 		//String path = absolutePath+"src\\es5\\test\\euclid.lft";
-		String path = absolutePath+"src\\es5\\test\\factorial.lft";
+		//String path = absolutePath+"src\\es5\\test\\factorial.lft";
+		String path = absolutePath+"src\\es5\\test\\testBoolean.lft";
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			Translator translator = new Translator(lex, br);

@@ -25,4 +25,18 @@ public class MyNameTest extends TestCase{
 	    assertFalse(GenericName.scan("FABIO","WDKOR"));
 
     }
+	    @Test
+	    public void testMyName() throws Exception {
+		    assertTrue(MyName.scan("ZABIO"));
+		    assertTrue(MyName.scan("F*BIO"));
+		    assertTrue(MyName.scan("FACIO"));
+		    assertTrue(MyName.scan("FABRO"));
+		    assertTrue(MyName.scan("FABIS"));
+		    assertFalse(MyName.scan("AMANDA"));
+		    assertFalse(MyName.scan("FFFABIO"));
+		    assertFalse(MyName.scan("FABIOLA"));
+		    assertFalse(MyName.scan("FXBIS"));
+		    assertFalse(MyName.scan("WDKOR"));
+
+	    }
 }
